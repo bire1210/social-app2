@@ -45,6 +45,7 @@ Thumbs.db
 .next
 out
 #environment variables
+.env
 .env.local
 test-output
 vitest.config.*.timestamp*
