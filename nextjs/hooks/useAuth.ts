@@ -9,6 +9,7 @@ export const useAuth = () => {
   const register = useAuthStore((state) => state.register);
   const logout = useAuthStore((state) => state.logout);
   const setUser = useAuthStore((state) => state.setUser);
+  const checkAuth = useAuthStore((state) => state.checkAuth);
 
-  return { user, loading, login, register, logout, setUser };
+  return { user, loading, login, register, logout, setUser, checkAuth };
 };

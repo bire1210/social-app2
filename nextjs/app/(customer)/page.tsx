@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useFeed } from "@/hooks/usePosts";
 import { CreatePost } from "@/components/posts/CreatePost";
 import { PostCard } from "@/components/posts/PostCard";
+import { StoriesRow } from "@/components/feed/StoriesRow";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 export default function FeedPage() {
@@ -42,36 +43,32 @@ function AuthenticatedFeed() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Home</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Your personalized feed
-        </p>
-      </div>
+    <div className="space-y-4">
+      {/* Stories */}
+      <StoriesRow />
 
+      {/* Create Post */}
       <CreatePost />
 
+      {/* Posts Feed */}
       <div className="space-y-4">
         {posts.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-16 bg-card rounded-xl border border-border">
             <p className="text-muted-foreground text-lg">
               No posts yet. Follow people or create your first post! ✨
             </p>
           </div>
         ) : (
-          posts.map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))
+          posts.map((post) => <PostCard key={post._id} post={post} />)
         )}
 
         {hasNextPage && posts.length > 0 && (
           <button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            className="w-full py-3 text-sm text-blue-500 hover:text-blue-500 transition-colors"
+            className="w-full py-3 text-sm text-blue-500 hover:text-blue-600 transition-colors bg-card rounded-xl border border-border font-medium"
           >
-            {isFetchingNextPage ? "Loading..." : "Load more"}
+            {isFetchingNextPage ? "Loading..." : "Load more posts"}
           </button>
         )}
       </div>

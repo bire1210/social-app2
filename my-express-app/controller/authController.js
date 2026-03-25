@@ -5,49 +5,68 @@ const asyncHandler = require("../utils/asyncHandler");
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
+const asyncHandler = require("express-async-handler");
+const User = require("../models/User");
+const ApiError = require("../utils/ApiError");
+
 exports.register = asyncHandler(async (req, res) => {
   const { username, email, password, fullName } = req.body;
-  // Check if user already exists
+
+  // 🔍 1. Basic validation
+  if (!username || !email || !password || !fullName) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  if (password.length < 6) {
+    throw new ApiError(400, "Password must be at least 6 characters");
+  }
+
+  // 🧼 2. Normalize email
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // 🔎 3. Check existing user
   const existingUser = await User.findOne({
-    $or: [{ email }, { username }],
+    $or: [{ email: normalizedEmail }, { username }],
   });
 
   if (existingUser) {
     throw new ApiError(
       400,
-      existingUser.email === email
+      existingUser.email === normalizedEmail
         ? "Email already registered"
         : "Username already taken"
     );
   }
 
+  // 👤 4. Create user
   const user = await User.create({
-    username,
-    email,
+    username: username.trim(),
+    email: normalizedEmail,
     password,
-    fullName,
+    fullName: fullName.trim(),
   });
 
+  // 🔐 5. Generate JWT
   const token = user.generateAuthToken();
 
-  // Set cookie
+  // 🍪 6. Set secure cookie
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+    sameSite: "strict", // CSRF protection
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
-  // Remove password from response
-  user.password = undefined;
+  // 🧹 7. Remove sensitive data
+  const userObj = user.toObject();
+  delete userObj.password;
 
+  // 📤 8. Send response (NO token here!)
   res.status(201).json({
     success: true,
-    token,
-    user,
+    user: userObj,
   });
 });
-
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public

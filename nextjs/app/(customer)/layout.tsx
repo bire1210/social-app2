@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { TopNavbar } from "@/components/layout/TopNavbar";
+import { RightSidebar } from "@/components/layout/RightSidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
@@ -23,19 +23,31 @@ export default function CustomerLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Desktop sidebar */}
+    <div className="min-h-screen bg-background">
+      {/* Top Navbar — Desktop */}
       <div className="hidden md:block">
-        <Sidebar />
+        <TopNavbar />
       </div>
 
-      {/* Mobile nav */}
+      {/* Mobile top + bottom nav */}
       <MobileNav />
 
-      {/* Main content */}
-      <main className="flex-1 min-h-screen md:ml-0 mt-14 md:mt-0 mb-16 md:mb-0">
-        <div className="max-w-2xl mx-auto px-4 py-6">{children}</div>
-      </main>
+      <div className="flex max-w-[1920px] mx-auto">
+        {/* Left Sidebar — Desktop */}
+        <div className="hidden lg:block shrink-0">
+          <Sidebar />
+        </div>
+
+        {/* Main content */}
+        <main className="flex-1 min-h-screen mt-14 md:mt-14 mb-16 md:mb-0">
+          <div className="max-w-[680px] mx-auto px-4 py-4">{children}</div>
+        </main>
+
+        {/* Right Sidebar — Large screens only */}
+        <div className="hidden xl:block w-[340px] shrink-0 pr-4 mt-14">
+          <RightSidebar />
+        </div>
+      </div>
     </div>
   );
 }

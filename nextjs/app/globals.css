@@ -152,4 +152,28 @@
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  /* Hide scrollbar for stories row */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Story ring gradient animation */
+  .story-ring {
+    background: conic-gradient(
+      from 0deg,
+      #f09433, #e6683c, #dc2743, #cc2366,
+      #bc1888, #833ab4, #5851db, #405de6,
+      #f09433
+    );
+    animation: storyRingSpin 4s linear infinite;
+  }
+  @keyframes storyRingSpin {
+    from { filter: hue-rotate(0deg); }
+    to { filter: hue-rotate(360deg); }
+  }
 }

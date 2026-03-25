@@ -14,6 +14,8 @@ import {
   Share2,
   Trash2,
   MoreHorizontal,
+  ThumbsUp,
+  Globe,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -38,7 +40,9 @@ export function PostCard({ post }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(
     user ? post.likes.includes(user._id) : false
   );
-  const [likesCount, setLikesCount] = useState(post.likesCount || post.likes.length);
+  const [likesCount, setLikesCount] = useState(
+    post.likesCount || post.likes.length
+  );
 
   const handleLike = async () => {
     if (!user) {
@@ -76,11 +80,15 @@ export function PostCard({ post }: PostCardProps) {
     return `${UPLOADS_URL}${path}`;
   };
 
+  const commentsCount =
+    post.commentsCount ||
+    (Array.isArray(post.comments) ? post.comments.length : 0);
+
   return (
     <>
-      <article className="border border-border rounded-2xl p-4 bg-card hover:bg-accent/30 transition-colors duration-200">
+      <article className="bg-card rounded-xl border border-border shadow-sm">
         {/* Header */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between px-4 pt-4">
           <Link
             href={`/profile/${post.author._id}`}
             className="flex items-center gap-3 group"
@@ -91,94 +99,133 @@ export function PostCard({ post }: PostCardProps) {
               className="h-10 w-10"
             />
             <div>
-              <p className="font-semibold text-sm group-hover:text-blue-500 transition-colors">
+              <p className="font-semibold text-sm group-hover:underline">
                 {post.author.fullName}
               </p>
-              <p className="text-xs text-muted-foreground">
-                @{post.author.username} ·{" "}
-                {formatDistanceToNow(new Date(post.createdAt), {
-                  addSuffix: true,
-                })}
-              </p>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <span>
+                  {formatDistanceToNow(new Date(post.createdAt), {
+                    addSuffix: true,
+                  })}
+                </span>
+                <span>·</span>
+                <Globe className="h-3 w-3" />
+              </div>
             </div>
           </Link>
 
-          {user && user._id === post.author._id && (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={handleDelete}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <div className="flex items-center gap-1">
+            {user && user._id === post.author._id && (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-5 w-5" />
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={handleDelete}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
 
         {/* Content */}
-        <p className="mt-3 text-sm leading-relaxed whitespace-pre-wrap">
-          {post.content}
-        </p>
+        <div className="px-4 mt-2">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+            {post.content}
+          </p>
+        </div>
 
         {/* Image */}
         {post.image && (
-          <div className="mt-3 rounded-xl overflow-hidden">
+          <div className="mt-3">
             <img
               src={getImageUrl(post.image)}
               alt="Post image"
-              className="w-full max-h-96 object-cover rounded-xl"
+              className="w-full max-h-[500px] object-cover"
             />
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex items-center gap-6 mt-4 pt-3 border-t border-border">
+        {/* Like & Comment counts */}
+        {(likesCount > 0 || commentsCount > 0) && (
+          <div className="flex items-center justify-between px-4 py-2.5 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              {likesCount > 0 && (
+                <>
+                  <div className="flex -space-x-1">
+                    <div className="h-[18px] w-[18px] rounded-full bg-blue-500 flex items-center justify-center">
+                      <ThumbsUp className="h-2.5 w-2.5 text-white" />
+                    </div>
+                    <div className="h-[18px] w-[18px] rounded-full bg-rose-500 flex items-center justify-center">
+                      <Heart className="h-2.5 w-2.5 text-white fill-white" />
+                    </div>
+                  </div>
+                  <span>{likesCount}</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              {commentsCount > 0 && (
+                <span>
+                  {commentsCount} comment{commentsCount !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Divider */}
+        <div className="border-t border-border mx-4" />
+
+        {/* Action buttons — Facebook style */}
+        <div className="flex items-center px-2 py-1">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-1.5 text-sm transition-all duration-200 ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all duration-200 ${
               isLiked
-                ? "text-rose-500"
-                : "text-muted-foreground hover:text-rose-500"
+                ? "text-blue-500"
+                : "text-muted-foreground hover:bg-accent"
             }`}
           >
-            <Heart
-              className={`h-[18px] w-[18px] transition-all duration-200 ${
-                isLiked ? "fill-rose-500 scale-110" : ""
+            <ThumbsUp
+              className={`h-5 w-5 transition-all duration-200 ${
+                isLiked ? "fill-blue-500 text-blue-500" : ""
               }`}
             />
-            <span>{likesCount}</span>
+            <span className="text-sm font-medium">Like</span>
           </button>
 
           {user ? (
             <Link
               href={`/post/${post._id}`}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-blue-500 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-muted-foreground hover:bg-accent transition-colors"
             >
-              <MessageCircle className="h-[18px] w-[18px]" />
-              <span>{post.commentsCount || (Array.isArray(post.comments) ? post.comments.length : 0)}</span>
+              <MessageCircle className="h-5 w-5" />
+              <span className="text-sm font-medium">Comment</span>
             </Link>
           ) : (
             <button
               onClick={handleComment}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-blue-500 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-muted-foreground hover:bg-accent transition-colors"
             >
-              <MessageCircle className="h-[18px] w-[18px]" />
-              <span>{post.commentsCount || (Array.isArray(post.comments) ? post.comments.length : 0)}</span>
+              <MessageCircle className="h-5 w-5" />
+              <span className="text-sm font-medium">Comment</span>
             </button>
           )}
 
-          <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-emerald-400 transition-colors">
-            <Share2 className="h-[18px] w-[18px]" />
+          <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-muted-foreground hover:bg-accent transition-colors">
+            <Share2 className="h-5 w-5" />
+            <span className="text-sm font-medium">Share</span>
           </button>
         </div>
       </article>
