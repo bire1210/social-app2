@@ -16,25 +16,32 @@ import {
   PlusCircle,
   Sun,
   Moon,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
-
-const navItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/explore", label: "Explore", icon: Search },
-  { href: "/notifications", label: "Notifications", icon: Bell },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
 
+  // Different nav items for guests vs authenticated users
+  const navItems = user
+    ? [
+        { href: "/", label: "Home", icon: Home },
+        { href: "/explore", label: "Explore", icon: Search },
+        { href: "/notifications", label: "Notifications", icon: Bell },
+        { href: "/settings", label: "Settings", icon: Settings },
+      ]
+    : [
+        { href: "/explore", label: "Explore", icon: Search },
+      ];
+
   return (
     <aside className="sticky top-0 h-screen w-[72px] lg:w-[240px] border-r border-border flex flex-col py-6 px-3 lg:px-4 bg-card/50 backdrop-blur-xl">
       {/* Logo */}
       <Link
-        href="/"
+        href={user ? "/" : "/explore"}
         className="flex items-center gap-2 mb-8 px-2"
       >
         <div className="h-9 w-9 rounded-xl bg-linear-to-br from-blue-500 to-blue-500 flex items-center justify-center shrink-0">
@@ -75,7 +82,7 @@ export function Sidebar() {
           );
         })}
 
-        {/* Profile link */}
+        {/* Profile link (authenticated only) */}
         {user && (
           <Link
             href={`/profile/${user._id}`}
@@ -108,30 +115,50 @@ export function Sidebar() {
           </span>
         </button>
 
-        {/* Logout */}
-        <button
-          onClick={logout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all w-full"
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          <span className="hidden lg:block font-medium">Logout</span>
-        </button>
+        {user ? (
+          <>
+            {/* Logout */}
+            <button
+              onClick={logout}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all w-full"
+            >
+              <LogOut className="h-5 w-5 shrink-0" />
+              <span className="hidden lg:block font-medium">Logout</span>
+            </button>
 
-        {/* User info */}
-        {user && (
-          <div className="flex items-center gap-3 p-2 rounded-xl bg-accent/50 mt-2">
-            <UserAvatar
-              src={user.avatar}
-              fallback={user.fullName}
-              className="h-9 w-9"
-            />
-            <div className="hidden lg:block overflow-hidden">
-              <p className="text-sm font-semibold truncate">{user.fullName}</p>
-              <p className="text-xs text-muted-foreground truncate">
-                @{user.username}
-              </p>
+            {/* User info */}
+            <div className="flex items-center gap-3 p-2 rounded-xl bg-accent/50 mt-2">
+              <UserAvatar
+                src={user.avatar}
+                fallback={user.fullName}
+                className="h-9 w-9"
+              />
+              <div className="hidden lg:block overflow-hidden">
+                <p className="text-sm font-semibold truncate">{user.fullName}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  @{user.username}
+                </p>
+              </div>
             </div>
-          </div>
+          </>
+        ) : (
+          <>
+            {/* Guest: Sign In & Register buttons */}
+            <Link
+              href="/login"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-blue-500 hover:bg-blue-500/10 transition-all w-full"
+            >
+              <LogIn className="h-5 w-5 shrink-0" />
+              <span className="hidden lg:block font-medium">Sign In</span>
+            </Link>
+            <Link
+              href="/register"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-accent hover:text-foreground transition-all w-full"
+            >
+              <UserPlus className="h-5 w-5 shrink-0" />
+              <span className="hidden lg:block font-medium">Create Account</span>
+            </Link>
+          </>
         )}
       </div>
     </aside>

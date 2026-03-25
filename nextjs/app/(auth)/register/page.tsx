@@ -143,6 +143,15 @@ export default function RegisterPage() {
               Sign in
             </Link>
           </p>
+
+          <p className="text-center text-sm">
+            <Link
+              href="/explore"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Continue as Guest →
+            </Link>
+          </p>
         </div>
       </div>
     </div>

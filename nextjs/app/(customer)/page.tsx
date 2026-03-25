@@ -1,11 +1,32 @@
 "use client";
 
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useFeed } from "@/hooks/usePosts";
 import { CreatePost } from "@/components/posts/CreatePost";
 import { PostCard } from "@/components/posts/PostCard";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 export default function FeedPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  // Guests get redirected to explore (feed requires auth)
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/explore");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return <LoadingSpinner className="mt-20" />;
+  }
+
+  return <AuthenticatedFeed />;
+}
+
+function AuthenticatedFeed() {
   const {
     data,
     isLoading,

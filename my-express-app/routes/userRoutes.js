@@ -8,14 +8,16 @@ const {
   getSuggestedUsers,
 } = require("../controller/userController");
 const auth = require("../middleware/auth");
+const optionalAuth = require("../middleware/optionalAuth");
 const upload = require("../middleware/upload");
 
-router.use(auth); // All user routes require authentication
+// Public routes (guests can browse)
+router.get("/search", optionalAuth, searchUsers);
+router.get("/:id", optionalAuth, getUserProfile);
 
-router.get("/search", searchUsers);
-router.get("/suggested", getSuggestedUsers);
-router.get("/:id", getUserProfile);
-router.put("/profile", upload.single("avatar"), updateProfile);
-router.post("/:id/follow", toggleFollow);
+// Private routes (require authentication)
+router.get("/suggested", auth, getSuggestedUsers);
+router.put("/profile", auth, upload.single("avatar"), updateProfile);
+router.post("/:id/follow", auth, toggleFollow);
 
 module.exports = router;

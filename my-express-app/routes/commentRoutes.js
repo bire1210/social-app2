@@ -6,11 +6,13 @@ const {
   deleteComment,
 } = require("../controller/commentController");
 const auth = require("../middleware/auth");
+const optionalAuth = require("../middleware/optionalAuth");
 
-router.use(auth);
+// Public routes (guests can read comments)
+router.get("/:postId", optionalAuth, getComments);
 
-router.post("/:postId", addComment);
-router.get("/:postId", getComments);
-router.delete("/:id", deleteComment);
+// Private routes (require authentication)
+router.post("/:postId", auth, addComment);
+router.delete("/:id", auth, deleteComment);
 
 module.exports = router;

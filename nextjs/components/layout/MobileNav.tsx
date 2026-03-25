@@ -5,26 +5,44 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Home, Search, Bell, User, Settings } from "lucide-react";
+import { Menu, Home, Search, Bell, User, Settings, LogIn, UserPlus } from "lucide-react";
 import { useState } from "react";
-
-const navItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/explore", label: "Explore", icon: Search },
-  { href: "/notifications", label: "Notifications", icon: Bell },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
 
 export function MobileNav() {
   const pathname = usePathname();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
+  const navItems = user
+    ? [
+        { href: "/", label: "Home", icon: Home },
+        { href: "/explore", label: "Explore", icon: Search },
+        { href: "/notifications", label: "Notifications", icon: Bell },
+        { href: "/settings", label: "Settings", icon: Settings },
+      ]
+    : [
+        { href: "/explore", label: "Explore", icon: Search },
+      ];
+
+  // Bottom bar items for mobile
+  const bottomItems = user
+    ? [
+        { href: "/", label: "Home", icon: Home },
+        { href: "/explore", label: "Explore", icon: Search },
+        { href: "/notifications", label: "Notifications", icon: Bell },
+        { href: "/settings", label: "Settings", icon: Settings },
+      ]
+    : [
+        { href: "/explore", label: "Explore", icon: Search },
+        { href: "/login", label: "Sign In", icon: LogIn },
+        { href: "/register", label: "Sign Up", icon: UserPlus },
+      ];
+
   return (
     <>
       {/* Top bar for mobile */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href={user ? "/" : "/explore"} className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-500 to-blue-500 flex items-center justify-center">
             <span className="text-white font-bold text-sm">V</span>
           </div>
@@ -71,6 +89,27 @@ export function MobileNav() {
                   <span className="font-medium">Profile</span>
                 </Link>
               )}
+              {!user && (
+                <>
+                  <div className="border-t border-border my-3" />
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-blue-500 hover:bg-blue-500/10"
+                  >
+                    <LogIn className="h-5 w-5" />
+                    <span className="font-medium">Sign In</span>
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-accent"
+                  >
+                    <UserPlus className="h-5 w-5" />
+                    <span className="font-medium">Create Account</span>
+                  </Link>
+                </>
+              )}
             </nav>
           </SheetContent>
         </Sheet>
@@ -78,7 +117,7 @@ export function MobileNav() {
 
       {/* Bottom nav bar for mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/80 backdrop-blur-xl px-2 py-1 flex items-center justify-around">
-        {navItems.slice(0, 4).map((item) => {
+        {bottomItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link

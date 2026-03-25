@@ -10,16 +10,18 @@ const {
   toggleLike,
 } = require("../controller/postController");
 const auth = require("../middleware/auth");
+const optionalAuth = require("../middleware/optionalAuth");
 const upload = require("../middleware/upload");
 
-router.use(auth); // All post routes require authentication
+// Public routes (guests can browse)
+router.get("/explore", optionalAuth, getExplorePosts);
+router.get("/user/:userId", optionalAuth, getUserPosts);
+router.get("/:id", optionalAuth, getPost);
 
-router.post("/", upload.single("image"), createPost);
-router.get("/feed", getFeed);
-router.get("/explore", getExplorePosts);
-router.get("/user/:userId", getUserPosts);
-router.get("/:id", getPost);
-router.delete("/:id", deletePost);
-router.post("/:id/like", toggleLike);
+// Private routes (require authentication)
+router.post("/", auth, upload.single("image"), createPost);
+router.get("/feed", auth, getFeed);
+router.delete("/:id", auth, deletePost);
+router.post("/:id/like", auth, toggleLike);
 
 module.exports = router;

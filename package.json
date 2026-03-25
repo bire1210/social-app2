@@ -1,0 +1,17 @@
+{
+  "name": "my-fullstack-social-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"backend,frontend\" -c \"yellow,cyan\" \"npm run dev --prefix my-express-app\" \"npm run dev --prefix nextjs\"",
+    "dev:backend": "npm run dev --prefix my-express-app",
+    "dev:frontend": "npm run dev --prefix nextjs",
+    "build": "npm run build --prefix nextjs",
+    "start": "concurrently \"npm start --prefix my-express-app\" \"npm start --prefix nextjs\""
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "concurrently": "^9.1.2",
+    "tailwindcss": "^4.2.2"
+  }
+}

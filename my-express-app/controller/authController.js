@@ -7,7 +7,6 @@ const asyncHandler = require("../utils/asyncHandler");
 // @access  Public
 exports.register = asyncHandler(async (req, res) => {
   const { username, email, password, fullName } = req.body;
-  console.log(req.body);
   // Check if user already exists
   const existingUser = await User.findOne({
     $or: [{ email }, { username }],

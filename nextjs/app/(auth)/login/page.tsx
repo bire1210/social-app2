@@ -111,6 +111,15 @@ export default function LoginPage() {
               Create one
             </Link>
           </p>
+
+          <p className="text-center text-sm">
+            <Link
+              href="/explore"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Continue as Guest →
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -13,13 +13,6 @@ export default function CustomerLayout({
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
 
   if (loading) {
     return (
@@ -28,8 +21,6 @@ export default function CustomerLayout({
       </div>
     );
   }
-
-  if (!user) return null;
 
   return (
     <div className="flex min-h-screen">
