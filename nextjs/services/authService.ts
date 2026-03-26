@@ -11,7 +11,7 @@ export const authService = {
     const res = await api.post("/auth/register", data);
     return res.data;
   },
-
+ 
   login: async (data: {
     email: string;
     password: string;

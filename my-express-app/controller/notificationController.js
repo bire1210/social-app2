@@ -53,7 +53,6 @@ exports.deleteNotification = asyncHandler(async (req, res) => {
     _id: req.params.id,
     recipient: req.user._id,
   });
-
   res.status(200).json({
     success: true,
     message: "Notification deleted",
