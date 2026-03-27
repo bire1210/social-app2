@@ -44,7 +44,7 @@ export default function RegisterPage() {
           <div className="h-20 w-20 rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6">
             <span className="text-white font-bold text-4xl">V</span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">Join Velora</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">Join BireSocial</h1>
           <p className="text-white/80 text-lg max-w-md">
             Create your account and start connecting with people around the
             world.

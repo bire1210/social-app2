@@ -80,11 +80,11 @@ export function RightSidebar() {
               <span className="text-white text-3xl font-bold">V+</span>
             </div>
             <div>
-              <p className="text-sm font-semibold">Velora Premium</p>
+              <p className="text-sm font-semibold">BireSocial Premium</p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Unlock exclusive features and badges
               </p>
-              <p className="text-xs text-blue-500 mt-1">velora.app</p>
+              <p className="text-xs text-blue-500 mt-1">biresocial.app</p>
             </div>
           </div>
         </div>
@@ -181,7 +181,7 @@ export function RightSidebar() {
       {/* Footer links */}
       <div className="px-2 pt-2">
         <p className="text-[10px] text-muted-foreground leading-relaxed">
-          Privacy · Terms · Advertising · Cookies · More · Velora © 2026
+          Privacy · Terms · Advertising · Cookies · More · BireSocial © 2026
         </p>
       </div>
     </aside>

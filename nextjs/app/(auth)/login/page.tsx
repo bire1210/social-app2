@@ -40,7 +40,7 @@ export default function LoginPage() {
           <div className="h-20 w-20 rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6">
             <span className="text-white font-bold text-4xl">V</span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">Welcome to Velora</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">Welcome to BireSocial</h1>
           <p className="text-white/80 text-lg max-w-md">
             Connect with friends, share your moments, and discover a world of
             possibilities.

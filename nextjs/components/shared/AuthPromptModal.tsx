@@ -56,7 +56,7 @@ export function AuthPromptModal({
           </div>
 
           <div>
-            <h3 className="text-lg font-bold">Join Velora</h3>
+            <h3 className="text-lg font-bold">Join BireSocial</h3>
             <p className="text-sm text-muted-foreground mt-1">{message}</p>
           </div>
 

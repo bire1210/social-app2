@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { Post, Comment } from "@/types";
+import { useState, useRef } from "react";
+import { Post, Comment, ReactionType, REACTIONS } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
-import { useToggleLike, useDeletePost, useEditPost } from "@/hooks/usePosts";
+import { useReactToPost, useDeletePost, useEditPost } from "@/hooks/usePosts";
 import { useComments, useAddComment, useDeleteComment } from "@/hooks/useComments";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { AuthPromptModal } from "@/components/shared/AuthPromptModal";
+import { ReactionPicker } from "@/components/posts/ReactionPicker";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { UPLOADS_URL } from "@/lib/constants";
 import {
-  Heart,
   MessageCircle,
   Share2,
   Trash2,
@@ -21,7 +21,6 @@ import {
   Pencil,
   Loader2,
   Send,
-  Link as LinkIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,9 +36,18 @@ interface PostCardProps {
   post: Post;
 }
 
+const REACTION_META: Record<ReactionType, { emoji: string; label: string; color: string }> = {
+  like: { emoji: "👍", label: "Like", color: "text-blue-500" },
+  love: { emoji: "❤️", label: "Love", color: "text-red-500" },
+  haha: { emoji: "😂", label: "Haha", color: "text-yellow-500" },
+  wow: { emoji: "😮", label: "Wow", color: "text-yellow-500" },
+  sad: { emoji: "😢", label: "Sad", color: "text-yellow-500" },
+  angry: { emoji: "😡", label: "Angry", color: "text-orange-500" },
+};
+
 export function PostCard({ post }: PostCardProps) {
   const { user } = useAuth();
-  const toggleLike = useToggleLike();
+  const reactToPost = useReactToPost();
   const deletePost = useDeletePost();
   const editPost = useEditPost();
   const addComment = useAddComment();
@@ -50,12 +58,17 @@ export function PostCard({ post }: PostCardProps) {
   const [commentText, setCommentText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [isLiked, setIsLiked] = useState(
-    user ? post.likes.includes(user._id) : false
+  const [userReaction, setUserReaction] = useState<ReactionType | null>(
+    (post.userReaction as ReactionType) ?? null
   );
-  const [likesCount, setLikesCount] = useState(
-    post.likesCount || post.likes.length
+  const [reactionCounts, setReactionCounts] = useState<Record<string, number>>(
+    post.reactionCounts ?? {}
+  );
+  const [totalReactions, setTotalReactions] = useState(
+    post.reactions?.length ?? post.likesCount ?? 0
   );
 
   const { data: commentsData, isLoading: commentsLoading } = useComments(
@@ -73,16 +86,46 @@ export function PostCard({ post }: PostCardProps) {
     return `${UPLOADS_URL}${path}`;
   };
 
-  const handleLike = async () => {
+  const handleReact = async (type: ReactionType) => {
     if (!user) { setShowAuthPrompt(true); return; }
-    if (toggleLike.isPending) return;
-    try {
-      const res = await toggleLike.mutateAsync(post._id);
-      setIsLiked(res.isLiked);
-      setLikesCount((prev) => (res.isLiked ? prev + 1 : prev - 1));
-    } catch {
-      toast.error("Failed to like post");
+    setShowReactionPicker(false);
+    if (reactToPost.isPending) return;
+
+    // Optimistic update
+    const prev = userReaction;
+    const prevCounts = { ...reactionCounts };
+    const prevTotal = totalReactions;
+
+    if (prev === type) {
+      setUserReaction(null);
+      setReactionCounts((c) => ({ ...c, [type]: Math.max(0, (c[type] ?? 0) - 1) }));
+      setTotalReactions((t) => Math.max(0, t - 1));
+    } else {
+      if (prev) {
+        setReactionCounts((c) => ({ ...c, [prev]: Math.max(0, (c[prev] ?? 0) - 1) }));
+      } else {
+        setTotalReactions((t) => t + 1);
+      }
+      setUserReaction(type);
+      setReactionCounts((c) => ({ ...c, [type]: (c[type] ?? 0) + 1 }));
     }
+
+    try {
+      const res = await reactToPost.mutateAsync({ id: post._id, type });
+      setUserReaction(res.userReaction as ReactionType | null);
+      setReactionCounts(res.reactionCounts);
+      setTotalReactions(res.totalReactions);
+    } catch {
+      setUserReaction(prev);
+      setReactionCounts(prevCounts);
+      setTotalReactions(prevTotal);
+      toast.error("Failed to react");
+    }
+  };
+
+  const handleLikeClick = () => {
+    if (!user) { setShowAuthPrompt(true); return; }
+    handleReact(userReaction === "like" ? "like" : "like");
   };
 
   const handleComment = () => {
@@ -136,6 +179,13 @@ export function PostCard({ post }: PostCardProps) {
     }
   };
 
+  // Top reactions to show in the count row
+  const topReactions = REACTIONS.filter((r) => (reactionCounts[r.type] ?? 0) > 0)
+    .sort((a, b) => (reactionCounts[b.type] ?? 0) - (reactionCounts[a.type] ?? 0))
+    .slice(0, 3);
+
+  const reactionMeta = userReaction ? REACTION_META[userReaction] : null;
+
   return (
     <>
       <article className="bg-card rounded-xl border border-border shadow-sm">
@@ -144,7 +194,12 @@ export function PostCard({ post }: PostCardProps) {
           <Link href={`/profile/${post.author._id}`} className="flex items-center gap-3 group">
             <UserAvatar src={post.author.avatar} fallback={post.author.fullName} className="h-10 w-10" />
             <div>
-              <p className="font-semibold text-sm group-hover:underline">{post.author.fullName}</p>
+              <p className="font-semibold text-sm group-hover:underline">
+                {post.author.fullName}
+                {post.feeling && (
+                  <span className="font-normal text-muted-foreground"> is {post.feeling}</span>
+                )}
+              </p>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
                 {post.isEdited && <><span>·</span><span>Edited</span></>}
@@ -208,21 +263,20 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         )}
 
-        {/* Like & Comment counts */}
-        {(likesCount > 0 || commentsCount > 0) && (
+        {/* Reaction & comment counts */}
+        {(totalReactions > 0 || commentsCount > 0) && (
           <div className="flex items-center justify-between px-4 py-2.5 text-sm text-muted-foreground">
             <div className="flex items-center gap-1.5">
-              {likesCount > 0 && (
+              {totalReactions > 0 && (
                 <>
                   <div className="flex -space-x-1">
-                    <div className="h-[18px] w-[18px] rounded-full bg-blue-500 flex items-center justify-center">
-                      <ThumbsUp className="h-2.5 w-2.5 text-white" />
-                    </div>
-                    <div className="h-[18px] w-[18px] rounded-full bg-rose-500 flex items-center justify-center">
-                      <Heart className="h-2.5 w-2.5 text-white fill-white" />
-                    </div>
+                    {topReactions.map((r) => (
+                      <div key={r.type} className="h-[18px] w-[18px] rounded-full bg-accent flex items-center justify-center text-[11px]">
+                        {r.emoji}
+                      </div>
+                    ))}
                   </div>
-                  <span>{likesCount}</span>
+                  <span>{totalReactions}</span>
                 </>
               )}
             </div>
@@ -239,15 +293,42 @@ export function PostCard({ post }: PostCardProps) {
 
         {/* Action buttons */}
         <div className="flex items-center px-2 py-1">
-          <button
-            onClick={handleLike}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all duration-200 ${
-              isLiked ? "text-blue-500" : "text-muted-foreground hover:bg-accent"
-            }`}
+          {/* Like with reaction picker on hover */}
+          <div
+            className="flex-1 relative"
+            onMouseEnter={() => {
+              if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+              hoverTimeout.current = setTimeout(() => setShowReactionPicker(true), 400);
+            }}
+            onMouseLeave={() => {
+              if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+              hoverTimeout.current = setTimeout(() => setShowReactionPicker(false), 300);
+            }}
           >
-            <ThumbsUp className={`h-5 w-5 transition-all duration-200 ${isLiked ? "fill-blue-500 text-blue-500" : ""}`} />
-            <span className="text-sm font-medium">Like</span>
-          </button>
+            {showReactionPicker && (
+              <div className="absolute bottom-full left-0 mb-1 z-20">
+                <ReactionPicker onReact={handleReact} />
+              </div>
+            )}
+            <button
+              onClick={handleLikeClick}
+              className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all duration-200 ${
+                reactionMeta ? reactionMeta.color : "text-muted-foreground hover:bg-accent"
+              }`}
+            >
+              {reactionMeta ? (
+                <>
+                  <span className="text-lg leading-none">{reactionMeta.emoji}</span>
+                  <span className="text-sm font-medium">{reactionMeta.label}</span>
+                </>
+              ) : (
+                <>
+                  <ThumbsUp className="h-5 w-5" />
+                  <span className="text-sm font-medium">Like</span>
+                </>
+              )}
+            </button>
+          </div>
 
           <button
             onClick={handleComment}
@@ -269,7 +350,6 @@ export function PostCard({ post }: PostCardProps) {
         {/* Comments section */}
         {showComments && (
           <div className="border-t border-border px-4 py-3 space-y-3">
-            {/* Add comment */}
             {user && (
               <form onSubmit={handleAddComment} className="flex items-center gap-2">
                 <UserAvatar src={user.avatar} fallback={user.fullName} className="h-8 w-8 shrink-0" />
@@ -293,7 +373,6 @@ export function PostCard({ post }: PostCardProps) {
               </form>
             )}
 
-            {/* Comments list */}
             {commentsLoading ? (
               <div className="flex justify-center py-2">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -335,7 +414,7 @@ export function PostCard({ post }: PostCardProps) {
       <AuthPromptModal
         open={showAuthPrompt}
         onClose={() => setShowAuthPrompt(false)}
-        message="Sign in to like, comment, and interact with posts"
+        message="Sign in to react, comment, and interact with posts"
       />
     </>
   );

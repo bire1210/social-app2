@@ -37,7 +37,7 @@ export function AdminSidebar() {
         </div>
         <div className="hidden lg:block">
           <span className="text-xl font-bold bg-linear-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
-            Velora
+            BireSocial
           </span>
           <span className="text-[10px] ml-2 px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-semibold uppercase tracking-wider">
             Admin

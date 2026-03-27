@@ -42,4 +42,9 @@ export const postService = {
     const res = await api.put(`/posts/${id}`, { content });
     return res.data;
   },
+
+  reactToPost: async (id: string, type: string): Promise<{ success: boolean; userReaction: string | null; reactionCounts: Record<string, number>; totalReactions: number }> => {
+    const res = await api.post(`/posts/${id}/react`, { type });
+    return res.data;
+  },
 };

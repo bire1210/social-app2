@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Velora — Social Media",
+  title: "BireSocial — Social Media",
   description: "Connect, Share, Inspire — Your social universe.",
 };
 

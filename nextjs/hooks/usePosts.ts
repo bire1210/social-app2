@@ -96,7 +96,18 @@ export function useToggleLike() {
   return useMutation({
     mutationFn: (id: string) => postService.toggleLike(id),
     onSuccess: () => {
-      // Invalidate to keep like counts in sync across pages
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+    },
+  });
+}
+
+export function useReactToPost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, type }: { id: string; type: string }) =>
+      postService.reactToPost(id, type),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
     },
   });

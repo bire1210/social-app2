@@ -38,7 +38,7 @@ export function Sidebar() {
           icon: null,
           isProfile: true,
         },
-        { href: "/explore", label: "Friends", icon: Users },
+        { href: "/friends", label: "Friends", icon: Users },
         { href: "#", label: "Memories", icon: Clock },
         { href: "#", label: "Saved", icon: Bookmark },
         { href: "#", label: "Groups", icon: UsersRound },
@@ -199,7 +199,7 @@ export function Sidebar() {
       <div className="mt-4 px-2">
         <p className="text-[10px] text-muted-foreground leading-relaxed">
           Privacy · Terms · Advertising · Ad Choices · Cookies ·
-          More · Velora © 2026
+          More · BireSocial © 2026
         </p>
       </div>
     </aside>

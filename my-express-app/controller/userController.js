@@ -147,11 +147,12 @@ exports.searchUsers = asyncHandler(async (req, res) => {
 // @route   GET /api/users/suggested
 // @access  Private
 exports.getSuggestedUsers = asyncHandler(async (req, res) => {
+  const limit = parseInt(req.query.limit) || 20;
   const users = await User.find({
     _id: { $ne: req.user._id, $nin: req.user.following },
   })
-    .select("username fullName avatar bio")
-    .limit(5);
+    .select("username fullName avatar bio coverImage followers following")
+    .limit(limit);
 
   res.status(200).json({
     success: true,

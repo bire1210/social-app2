@@ -24,8 +24,8 @@ export const userService = {
     return res.data;
   },
 
-  getSuggestedUsers: async (): Promise<{ success: boolean; users: User[] }> => {
-    const res = await api.get("/users/suggested");
+  getSuggestedUsers: async (limit = 20): Promise<{ success: boolean; users: User[] }> => {
+    const res = await api.get(`/users/suggested?limit=${limit}`);
     return res.data;
   },
 };

@@ -10,6 +10,7 @@ exports.createPost = asyncHandler(async (req, res) => {
   const postData = {
     author: req.user._id,
     content: req.body.content,
+    feeling: req.body.feeling || "",
   };
 
   if (req.file) {
@@ -51,11 +52,19 @@ exports.getFeed = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit);
 
+  // Attach userReaction for each post
+  const postsWithReaction = posts.map((post) => {
+    const obj = post.toObject({ virtuals: true });
+    const r = post.reactions.find((r) => r.user.toString() === req.user._id.toString());
+    obj.userReaction = r ? r.type : null;
+    return obj;
+  });
+
   const total = await Post.countDocuments({ author: { $in: feedUsers } });
 
   res.status(200).json({
     success: true,
-    posts,
+    posts: postsWithReaction,
     pagination: {
       page,
       limit,
@@ -182,45 +191,98 @@ exports.deletePost = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Like / Unlike a post
+// @desc    React to a post (like, love, haha, wow, sad, angry) or remove reaction
+// @route   POST /api/posts/:id/react
+// @access  Private
+exports.reactToPost = asyncHandler(async (req, res) => {
+  const { type } = req.body;
+  const validTypes = ["like", "love", "haha", "wow", "sad", "angry"];
+
+  if (!type || !validTypes.includes(type)) {
+    throw new ApiError(400, "Invalid reaction type");
+  }
+
+  const post = await Post.findById(req.params.id);
+  if (!post) throw new ApiError(404, "Post not found");
+
+  const existingIndex = post.reactions.findIndex(
+    (r) => r.user.toString() === req.user._id.toString()
+  );
+
+  let userReaction = null;
+
+  if (existingIndex !== -1) {
+    if (post.reactions[existingIndex].type === type) {
+      // Same reaction — remove it
+      post.reactions.splice(existingIndex, 1);
+    } else {
+      // Different reaction — update it
+      post.reactions[existingIndex].type = type;
+      userReaction = type;
+    }
+  } else {
+    // New reaction
+    post.reactions.push({ user: req.user._id, type });
+    userReaction = type;
+
+    if (post.author.toString() !== req.user._id.toString()) {
+      await createNotification({
+        recipient: post.author,
+        sender: req.user._id,
+        type: "like",
+        post: post._id,
+      });
+    }
+  }
+
+  await post.save();
+
+  const reactionCounts = { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 };
+  post.reactions.forEach((r) => { reactionCounts[r.type]++; });
+
+  res.status(200).json({
+    success: true,
+    userReaction,
+    reactionCounts,
+    totalReactions: post.reactions.length,
+  });
+});
+
+// @desc    Like / Unlike a post (legacy — kept for compatibility)
 // @route   POST /api/posts/:id/like
 // @access  Private
 exports.toggleLike = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
+  if (!post) throw new ApiError(404, "Post not found");
 
-  if (!post) {
-    throw new ApiError(404, "Post not found");
-  }
+  const existingIndex = post.reactions.findIndex(
+    (r) => r.user.toString() === req.user._id.toString()
+  );
 
-  const isLiked = post.likes.includes(req.user._id);
+  let userReaction = null;
 
-  if (isLiked) {
-    await Post.findByIdAndUpdate(req.params.id, {
-      $pull: { likes: req.user._id },
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Post unliked",
-      isLiked: false,
-    });
+  if (existingIndex !== -1 && post.reactions[existingIndex].type === "like") {
+    post.reactions.splice(existingIndex, 1);
   } else {
-    await Post.findByIdAndUpdate(req.params.id, {
-      $addToSet: { likes: req.user._id },
-    });
+    if (existingIndex !== -1) post.reactions.splice(existingIndex, 1);
+    post.reactions.push({ user: req.user._id, type: "like" });
+    userReaction = "like";
 
-    // Create notification
-    await createNotification({
-      recipient: post.author,
-      sender: req.user._id,
-      type: "like",
-      post: post._id,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Post liked",
-      isLiked: true,
-    });
+    if (post.author.toString() !== req.user._id.toString()) {
+      await createNotification({
+        recipient: post.author,
+        sender: req.user._id,
+        type: "like",
+        post: post._id,
+      });
+    }
   }
+
+  await post.save();
+
+  res.status(200).json({
+    success: true,
+    isLiked: userReaction === "like",
+    userReaction,
+  });
 });

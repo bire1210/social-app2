@@ -23,6 +23,19 @@ const postSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    reactions: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        type: {
+          type: String,
+          enum: ["like", "love", "haha", "wow", "sad", "angry"],
+        },
+      },
+    ],
+    feeling: {
+      type: String,
+      default: "",
+    },
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -43,7 +56,18 @@ const postSchema = new mongoose.Schema(
 
 // Virtual for like count
 postSchema.virtual("likesCount").get(function () {
-  return this.likes ? this.likes.length : 0;
+  return this.reactions ? this.reactions.length : (this.likes ? this.likes.length : 0);
+});
+
+// Virtual for reaction counts per type
+postSchema.virtual("reactionCounts").get(function () {
+  const counts = { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 };
+  if (this.reactions) {
+    this.reactions.forEach((r) => {
+      if (counts[r.type] !== undefined) counts[r.type]++;
+    });
+  }
+  return counts;
 });
 
 // Virtual for comment count

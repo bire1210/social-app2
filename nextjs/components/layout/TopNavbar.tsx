@@ -28,7 +28,7 @@ export function TopNavbar() {
   const navIcons = user
     ? [
         { href: "/", icon: Home, label: "Home" },
-        { href: "/explore", icon: Users, label: "Friends" },
+        { href: "/friends", icon: Users, label: "Friends" },
         { href: "/notifications", icon: Bell, label: "Notifications" },
       ]
     : [{ href: "/explore", icon: Users, label: "Explore" }];
@@ -53,7 +53,7 @@ export function TopNavbar() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Velora"
+              placeholder="Search BireSocial"
               className="h-10 w-[240px] rounded-full bg-accent/80 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500/30 transition-all"
             />
           </div>

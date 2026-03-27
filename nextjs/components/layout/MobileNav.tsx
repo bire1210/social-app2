@@ -50,7 +50,7 @@ export function MobileNav() {
             <span className="text-white font-bold text-sm">V</span>
           </div>
           <span className="font-bold bg-linear-to-r from-blue-500 to-blue-500 bg-clip-text text-transparent">
-            Velora
+            BireSocial
           </span>
         </Link>
 
