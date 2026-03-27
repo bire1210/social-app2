@@ -40,6 +40,14 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     updates.avatar = `/uploads/${req.file.filename}`;
   }
 
+  // Handle cover image (sent as separate field name)
+  if (req.files && req.files.coverImage) {
+    updates.coverImage = `/uploads/${req.files.coverImage[0].filename}`;
+  }
+  if (req.files && req.files.avatar) {
+    updates.avatar = `/uploads/${req.files.avatar[0].filename}`;
+  }
+
   const user = await User.findByIdAndUpdate(req.user._id, updates, {
     new: true,
     runValidators: true,

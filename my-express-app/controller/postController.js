@@ -133,6 +133,33 @@ exports.getUserPosts = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Edit a post
+// @route   PUT /api/posts/:id
+// @access  Private
+exports.editPost = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+
+  if (!post) {
+    throw new ApiError(404, "Post not found");
+  }
+
+  if (post.author.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You are not authorized to edit this post");
+  }
+
+  if (!req.body.content || !req.body.content.trim()) {
+    throw new ApiError(400, "Post content is required");
+  }
+
+  const updated = await Post.findByIdAndUpdate(
+    req.params.id,
+    { content: req.body.content.trim(), isEdited: true },
+    { new: true, runValidators: true }
+  ).populate("author", "username fullName avatar");
+
+  res.status(200).json({ success: true, post: updated });
+});
+
 // @desc    Delete a post
 // @route   DELETE /api/posts/:id
 // @access  Private

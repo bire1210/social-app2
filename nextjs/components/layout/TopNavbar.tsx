@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { useTheme } from "next-themes";
+import { useNotifications } from "@/hooks/useNotifications";
 import {
   Home,
   Search,
@@ -12,7 +13,6 @@ import {
   Sun,
   Moon,
   Users,
-  Menu,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -22,6 +22,8 @@ export function TopNavbar() {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: notifData } = useNotifications();
+  const unreadCount = notifData?.unreadCount ?? 0;
 
   const navIcons = user
     ? [
@@ -77,6 +79,11 @@ export function TopNavbar() {
                 <item.icon
                   className={`h-6 w-6 ${isActive ? "text-blue-500" : ""}`}
                 />
+                {item.label === "Notifications" && unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-6 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
                 {isActive && (
                   <div className="absolute bottom-0 left-2 right-2 h-[3px] bg-blue-500 rounded-t-full" />
                 )}
@@ -109,9 +116,14 @@ export function TopNavbar() {
           {user && (
             <Link
               href="/notifications"
-              className="h-10 w-10 rounded-full bg-accent/80 flex items-center justify-center hover:bg-accent transition-colors"
+              className="relative h-10 w-10 rounded-full bg-accent/80 flex items-center justify-center hover:bg-accent transition-colors"
             >
               <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
             </Link>
           )}
 

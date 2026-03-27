@@ -79,6 +79,17 @@ export function useDeletePost() {
   });
 }
 
+export function useEditPost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, content }: { id: string; content: string }) =>
+      postService.editPost(id, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+    },
+  });
+}
+
 export function useToggleLike() {
   const queryClient = useQueryClient();
 

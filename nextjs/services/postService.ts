@@ -37,4 +37,9 @@ export const postService = {
     const res = await api.post(`/posts/${id}/like`);
     return res.data;
   },
+
+  editPost: async (id: string, content: string): Promise<{ success: boolean; post: Post }> => {
+    const res = await api.put(`/posts/${id}`, { content });
+    return res.data;
+  },
 };

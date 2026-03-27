@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useNotifications } from "@/hooks/useNotifications";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, Home, Search, Bell, User, Settings, LogIn, UserPlus } from "lucide-react";
@@ -12,6 +13,8 @@ export function MobileNav() {
   const pathname = usePathname();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const { data: notifData } = useNotifications();
+  const unreadCount = notifData?.unreadCount ?? 0;
 
   const navItems = user
     ? [
@@ -123,11 +126,16 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-all ${
+              className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-all ${
                 isActive ? "text-blue-500" : "text-muted-foreground"
               }`}
             >
               <item.icon className="h-5 w-5" />
+              {item.label === "Notifications" && unreadCount > 0 && (
+                <span className="absolute -top-0.5 right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
               <span className="text-[10px]">{item.label}</span>
             </Link>
           );

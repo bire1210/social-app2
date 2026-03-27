@@ -7,6 +7,7 @@ const {
   getPost,
   getUserPosts,
   deletePost,
+  editPost,
   toggleLike,
 } = require("../controller/postController");
 const auth = require("../middleware/auth");
@@ -21,6 +22,7 @@ router.get("/:id", optionalAuth, getPost);
 // Private routes (require authentication)
 router.post("/", auth, upload.single("image"), createPost);
 router.get("/feed", auth, getFeed);
+router.put("/:id", auth, editPost);
 router.delete("/:id", auth, deletePost);
 router.post("/:id/like", auth, toggleLike);
 

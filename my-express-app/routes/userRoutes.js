@@ -17,7 +17,7 @@ router.get("/:id", optionalAuth, getUserProfile);
 
 // Private routes (require authentication)
 router.get("/suggested", auth, getSuggestedUsers);
-router.put("/profile", auth, upload.single("avatar"), updateProfile);
+router.put("/profile", auth, upload.fields([{ name: "avatar", maxCount: 1 }, { name: "coverImage", maxCount: 1 }]), updateProfile);
 router.post("/:id/follow", auth, toggleFollow);
 
 module.exports = router;
