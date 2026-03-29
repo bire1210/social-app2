@@ -19,13 +19,16 @@ export function CreatePost() {
   const [expanded, setExpanded] = useState(false);
   const [showFeelings, setShowFeelings] = useState(false);
   const [selectedFeeling, setSelectedFeeling] = useState<{ emoji: string; label: string } | null>(null);
+  const [isVideo, setIsVideo] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setImage(file);
       setPreview(URL.createObjectURL(file));
+      setIsVideo(file.type.startsWith("video/"));
       setExpanded(true);
     }
   };
@@ -33,7 +36,9 @@ export function CreatePost() {
   const removeImage = () => {
     setImage(null);
     setPreview(null);
+    setIsVideo(false);
     if (fileRef.current) fileRef.current.value = "";
+    if (videoRef.current) videoRef.current.value = "";
   };
 
   const handleSubmit = async () => {
@@ -128,7 +133,15 @@ export function CreatePost() {
         {/* Image preview */}
         {preview && (
           <div className="relative mt-3 rounded-xl overflow-hidden border border-border">
-            <img src={preview} alt="Preview" className="w-full max-h-64 object-cover rounded-xl" />
+            {isVideo ? (
+              <video
+                src={preview}
+                controls
+                className="w-full max-h-64 rounded-xl bg-black"
+              />
+            ) : (
+              <img src={preview} alt="Preview" className="w-full max-h-64 object-cover rounded-xl" />
+            )}
             <button
               onClick={removeImage}
               className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full hover:bg-black/80 transition"
@@ -156,12 +169,13 @@ export function CreatePost() {
       <div className="border-t border-border mx-3 mt-3" />
 
       <div className="flex items-center px-2 py-1">
-        <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-accent transition-colors">
+        <button onClick={() => { toast("Live video coming soon! 🎥"); }} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-accent transition-colors">
           <Video className="h-5 w-5 text-red-500" />
           <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Live video</span>
         </button>
 
-        <input ref={fileRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+        <input ref={fileRef} type="file" accept="image/*,video/*" onChange={handleImageSelect} className="hidden" />
+        <input ref={videoRef} type="file" accept="video/*" onChange={handleImageSelect} className="hidden" />
         <button
           onClick={() => { fileRef.current?.click(); }}
           className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-accent transition-colors"

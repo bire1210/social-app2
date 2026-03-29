@@ -30,6 +30,8 @@ export interface Post {
   author: User;
   content: string;
   image: string;
+  video: string;
+  mediaType: "none" | "image" | "video";
   feeling?: string;
   likes: string[];
   reactions: Reaction[];

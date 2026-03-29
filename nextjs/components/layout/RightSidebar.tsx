@@ -77,7 +77,7 @@ export function RightSidebar() {
         <div className="rounded-xl overflow-hidden bg-accent/40 hover:bg-accent/60 transition-colors cursor-pointer p-3">
           <div className="flex items-center gap-3">
             <div className="h-[100px] w-[100px] rounded-lg bg-linear-to-br from-blue-400 to-purple-500 shrink-0 flex items-center justify-center">
-              <span className="text-white text-3xl font-bold">V+</span>
+              <span className="text-white text-3xl font-bold">B+</span>
             </div>
             <div>
               <p className="text-sm font-semibold">BireSocial Premium</p>

@@ -54,7 +54,7 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center">
             <div className="h-14 w-14 rounded-2xl bg-linear-to-br from-blue-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-2xl">V</span>
+              <span className="text-white font-bold text-2xl">B</span>
             </div>
           </div>
 

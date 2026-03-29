@@ -39,16 +39,16 @@ export function Sidebar() {
           isProfile: true,
         },
         { href: "/friends", label: "Friends", icon: Users },
-        { href: "#", label: "Memories", icon: Clock },
-        { href: "#", label: "Saved", icon: Bookmark },
-        { href: "#", label: "Groups", icon: UsersRound },
+        { href: "/explore", label: "Memories", icon: Clock },
+        { href: "/explore", label: "Saved", icon: Bookmark },
+        { href: "/friends", label: "Groups", icon: UsersRound },
       ]
     : [{ href: "/explore", label: "Explore", icon: Search }];
 
   const moreNavItems = [
-    { href: "#", label: "Reels", icon: Video },
-    { href: "#", label: "Marketplace", icon: ShoppingBag },
-    { href: "#", label: "Feeds", icon: Newspaper },
+    { href: "/explore", label: "Reels", icon: Video },
+    { href: "/explore", label: "Marketplace", icon: ShoppingBag },
+    { href: "/explore", label: "Feeds", icon: Newspaper },
   ];
 
   return (

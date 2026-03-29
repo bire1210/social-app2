@@ -33,7 +33,7 @@ export function AdminSidebar() {
       {/* Logo */}
       <div className="flex items-center gap-2 mb-8 px-2">
         <div className="h-9 w-9 rounded-xl bg-linear-to-br from-rose-500 to-orange-500 flex items-center justify-center shrink-0">
-          <span className="text-white font-bold text-lg">V</span>
+          <span className="text-white font-bold text-lg">B</span>
         </div>
         <div className="hidden lg:block">
           <span className="text-xl font-bold bg-linear-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">

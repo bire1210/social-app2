@@ -180,9 +180,6 @@ export default function ProfilePage() {
             <TabsTrigger value="posts" className="flex-1 rounded-lg">
               Posts ({posts.length})
             </TabsTrigger>
-            <TabsTrigger value="likes" className="flex-1 rounded-lg">
-              Likes
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="posts" className="space-y-4 mt-4">
@@ -197,11 +194,6 @@ export default function ProfilePage() {
             )}
           </TabsContent>
 
-          <TabsContent value="likes" className="mt-4">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Liked posts coming soon</p>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
 

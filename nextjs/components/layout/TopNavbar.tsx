@@ -14,13 +14,14 @@ import {
   Moon,
   Users,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function TopNavbar() {
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const { data: notifData } = useNotifications();
   const unreadCount = notifData?.unreadCount ?? 0;
@@ -43,7 +44,7 @@ export function TopNavbar() {
             className="flex items-center gap-2 shrink-0"
           >
             <div className="h-10 w-10 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">V</span>
+              <span className="text-white font-bold text-xl">B</span>
             </div>
           </Link>
 
@@ -53,6 +54,11 @@ export function TopNavbar() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchQuery.trim()) {
+                  router.push(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
+                }
+              }}
               placeholder="Search BireSocial"
               className="h-10 w-[240px] rounded-full bg-accent/80 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500/30 transition-all"
             />
@@ -108,9 +114,9 @@ export function TopNavbar() {
           </button>
 
           {/* Messenger */}
-          <button className="h-10 w-10 rounded-full bg-accent/80 flex items-center justify-center hover:bg-accent transition-colors">
+          <Link href="/friends" className="h-10 w-10 rounded-full bg-accent/80 flex items-center justify-center hover:bg-accent transition-colors">
             <MessageCircle className="h-5 w-5" />
-          </button>
+          </Link>
 
           {/* Notifications  */}
           {user && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useExplorePosts } from "@/hooks/usePosts";
 import { useSearchUsers } from "@/hooks/useUsers";
 import { PostCard } from "@/components/posts/PostCard";
@@ -9,11 +9,19 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function ExplorePage() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const { data: postsData, isLoading } = useExplorePosts();
   const { data: usersData, isFetching: searching } = useSearchUsers(searchQuery);
+
+  // Sync with URL query param changes
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) setSearchQuery(q);
+  }, [searchParams]);
 
   const posts = postsData?.posts ?? [];
   const users = usersData?.users ?? [];

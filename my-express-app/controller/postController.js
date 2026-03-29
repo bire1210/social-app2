@@ -14,7 +14,14 @@ exports.createPost = asyncHandler(async (req, res) => {
   };
 
   if (req.file) {
-    postData.image = `/uploads/${req.file.filename}`;
+    const isVideo = req.file.mimetype.startsWith("video/");
+    if (isVideo) {
+      postData.video = `/uploads/${req.file.filename}`;
+      postData.mediaType = "video";
+    } else {
+      postData.image = `/uploads/${req.file.filename}`;
+      postData.mediaType = "image";
+    }
   }
 
   const post = await Post.create(postData);

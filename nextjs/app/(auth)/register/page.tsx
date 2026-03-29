@@ -42,7 +42,7 @@ export default function RegisterPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(255,255,255,0.1),transparent_60%)]" />
         <div className="relative z-10 text-center px-12">
           <div className="h-20 w-20 rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6">
-            <span className="text-white font-bold text-4xl">V</span>
+            <span className="text-white font-bold text-4xl">B</span>
           </div>
           <h1 className="text-4xl font-bold text-white mb-4">Join BireSocial</h1>
           <p className="text-white/80 text-lg max-w-md">
@@ -57,7 +57,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-sm space-y-8">
           <div className="lg:hidden text-center">
             <div className="h-14 w-14 rounded-2xl bg-linear-to-br from-blue-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-2xl">V</span>
+              <span className="text-white font-bold text-2xl">B</span>
             </div>
           </div>
 

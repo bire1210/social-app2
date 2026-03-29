@@ -257,9 +257,21 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* Image */}
-        {post.image && (
+        {post.image && !post.video && (
           <div className="mt-3">
             <img src={getImageUrl(post.image)} alt="Post image" className="w-full max-h-[500px] object-cover" />
+          </div>
+        )}
+
+        {/* Video */}
+        {post.video && (
+          <div className="mt-3">
+            <video
+              src={getImageUrl(post.video)}
+              controls
+              preload="metadata"
+              className="w-full max-h-[500px] rounded-none bg-black"
+            />
           </div>
         )}
 

@@ -47,7 +47,7 @@ export function MobileNav() {
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl px-4 py-3 flex items-center justify-between">
         <Link href={user ? "/" : "/explore"} className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-500 to-blue-500 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">V</span>
+            <span className="text-white font-bold text-sm">B</span>
           </div>
           <span className="font-bold bg-linear-to-r from-blue-500 to-blue-500 bg-clip-text text-transparent">
             BireSocial

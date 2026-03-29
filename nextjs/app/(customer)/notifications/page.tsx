@@ -18,6 +18,7 @@ const notificationIcons = {
     bg: "bg-blue-500/10",
   },
   follow: { icon: UserPlus, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+  reaction: { icon: Heart, color: "text-orange-500", bg: "bg-orange-500/10" },
 };
 
 export default function NotificationsPage() {
@@ -87,11 +88,15 @@ export default function NotificationsPage() {
           notifications.map((n) => {
             const config = notificationIcons[n.type];
             const Icon = config.icon;
+            const href = n.type === "follow"
+              ? `/profile/${n.sender._id}`
+              : n.post ? `/post/${n.post}` : `/profile/${n.sender._id}`;
             return (
-              <div
+              <Link
                 key={n._id}
+                href={href}
                 className={`flex items-start gap-3 p-4 rounded-xl transition-colors ${
-                  n.isRead ? "bg-card" : "bg-accent/50"
+                  n.isRead ? "bg-card hover:bg-accent/30" : "bg-accent/50 hover:bg-accent/70"
                 }`}
               >
                 <div className={`p-2 rounded-full ${config.bg}`}>
@@ -99,12 +104,9 @@ export default function NotificationsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">
-                    <Link
-                      href={`/profile/${n.sender._id}`}
-                      className="font-semibold hover:text-blue-500 transition-colors"
-                    >
+                    <span className="font-semibold">
                       {n.sender.fullName}
-                    </Link>{" "}
+                    </span>{" "}
                     {getNotificationText(n)}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -118,7 +120,7 @@ export default function NotificationsPage() {
                   fallback={n.sender.fullName}
                   className="h-8 w-8"
                 />
-              </div>
+              </Link>
             );
           })
         )}
