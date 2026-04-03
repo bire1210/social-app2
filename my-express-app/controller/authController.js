@@ -54,7 +54,7 @@ exports.register = asyncHandler(async (req, res) => {
     success: true,
     token,
     user: userObj,
-  });
+  })
 });
 
 // @desc    Login user
