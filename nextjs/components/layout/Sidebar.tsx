@@ -46,7 +46,7 @@ export function Sidebar() {
     : [{ href: "/explore", label: "Explore", icon: Search }];
 
   const moreNavItems = [
-    { href: "/explore", label: "Reels", icon: Video },
+    { href: "/reels", label: "Reels", icon: Video },
     { href: "/explore", label: "Marketplace", icon: ShoppingBag },
     { href: "/explore", label: "Feeds", icon: Newspaper },
   ];

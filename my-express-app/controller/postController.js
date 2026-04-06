@@ -104,6 +104,41 @@ exports.getExplorePosts = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Get video-only posts (reels)
+// @route   GET /api/posts/videos
+// @access  Public (optional auth)
+exports.getVideoPosts = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const filter = { video: { $ne: "" } };
+
+  const posts = await Post.find(filter)
+    .populate("author", "username fullName avatar")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Post.countDocuments(filter);
+
+  // Attach userReaction if user is authenticated
+  const postsWithReaction = posts.map((post) => {
+    const obj = post.toObject({ virtuals: true });
+    if (req.user) {
+      const r = post.reactions.find((r) => r.user.toString() === req.user._id.toString());
+      obj.userReaction = r ? r.type : null;
+    }
+    return obj;
+  });
+
+  res.status(200).json({
+    success: true,
+    posts: postsWithReaction,
+    pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+  });
+});
+
 // @desc    Get a single post
 // @route   GET /api/posts/:id
 // @access  Private

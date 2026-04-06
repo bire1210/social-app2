@@ -6,7 +6,20 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Home, Search, Bell, User, Settings, LogIn, UserPlus } from "lucide-react";
+import {
+  Menu,
+  Home,
+  Search,
+  Bell,
+  User,
+  Settings,
+  LogIn,
+  UserPlus,
+  Clapperboard,
+  Store,
+  Users,
+  PlusCircle,
+} from "lucide-react";
 import { useState } from "react";
 
 export function MobileNav() {
@@ -19,6 +32,7 @@ export function MobileNav() {
   const navItems = user
     ? [
         { href: "/", label: "Home", icon: Home },
+        { href: "/reels", label: "Reels", icon: Clapperboard },
         { href: "/explore", label: "Explore", icon: Search },
         { href: "/notifications", label: "Notifications", icon: Bell },
         { href: "/settings", label: "Settings", icon: Settings },
@@ -27,19 +41,19 @@ export function MobileNav() {
         { href: "/explore", label: "Explore", icon: Search },
       ];
 
-  // Bottom bar items for mobile
-  const bottomItems = user
-    ? [
-        { href: "/", label: "Home", icon: Home },
-        { href: "/explore", label: "Explore", icon: Search },
-        { href: "/notifications", label: "Notifications", icon: Bell },
-        { href: "/settings", label: "Settings", icon: Settings },
-      ]
-    : [
-        { href: "/explore", label: "Explore", icon: Search },
-        { href: "/login", label: "Sign In", icon: LogIn },
-        { href: "/register", label: "Sign Up", icon: UserPlus },
-      ];
+  // Bottom bar items matching the Facebook-style layout:
+  // Home | Reels | Marketplace | Friends | Menu
+  const bottomItems = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/reels", label: "Reels", icon: Clapperboard },
+    { href: "/explore", label: "Marketplace", icon: Store },
+    { href: "/friends", label: "Friends", icon: Users },
+  ];
+
+  const isBottomActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   return (
     <>
@@ -118,41 +132,44 @@ export function MobileNav() {
         </Sheet>
       </header>
 
-      {/* Bottom nav bar for mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/80 backdrop-blur-xl px-2 py-1 flex items-center justify-around">
-        {bottomItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-all ${
-                isActive ? "text-blue-500" : "text-muted-foreground"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              {item.label === "Notifications" && unreadCount > 0 && (
-                <span className="absolute -top-0.5 right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-              <span className="text-[10px]">{item.label}</span>
-            </Link>
-          );
-        })}
-        {user && (
-          <Link
-            href={`/profile/${user._id}`}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-all ${
-              pathname.startsWith("/profile")
-                ? "text-blue-500"
-                : "text-muted-foreground"
-            }`}
+      {/* Bottom nav bar — Facebook-style: Home | Reels | Marketplace | Friends | Menu */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-xl">
+        <div className="flex items-center justify-around">
+          {bottomItems.map((item) => {
+            const active = isBottomActive(item.href);
+            return (
+              <Link
+                key={item.href + item.label}
+                href={item.href}
+                className="relative flex-1 flex flex-col items-center py-2.5 transition-all"
+              >
+                {/* Active indicator line on top */}
+                {active && (
+                  <span className="absolute top-0 left-2 right-2 h-[3px] rounded-b-full bg-blue-500" />
+                )}
+                <item.icon
+                  className={`h-6 w-6 transition-colors ${
+                    active ? "text-blue-500" : "text-muted-foreground"
+                  }`}
+                  {...(active && item.icon === Home ? { fill: "currentColor" } : {})}
+                />
+                {item.label === "Notifications" && unreadCount > 0 && (
+                  <span className="absolute top-1 right-1/4 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+
+          {/* Menu / More button */}
+          <button
+            onClick={() => setOpen(true)}
+            className="relative flex-1 flex flex-col items-center py-2.5 transition-all"
           >
-            <User className="h-5 w-5" />
-            <span className="text-[10px]">Profile</span>
-          </Link>
-        )}
+            <PlusCircle className="h-6 w-6 text-muted-foreground" />
+          </button>
+        </div>
       </nav>
     </>
   );

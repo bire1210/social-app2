@@ -19,6 +19,11 @@ export const postService = {
     return res.data;
   },
 
+  getVideoPosts: async (page = 1, limit = 10): Promise<{ success: boolean; posts: Post[]; pagination: Pagination }> => {
+    const res = await api.get(`/posts/videos?page=${page}&limit=${limit}`);
+    return res.data;
+  },
+
   getPost: async (id: string): Promise<{ success: boolean; post: Post }> => {
     const res = await api.get(`/posts/${id}`);
     return res.data;

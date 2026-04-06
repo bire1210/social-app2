@@ -13,6 +13,7 @@ export const postKeys = {
   all: ["posts"] as const,
   feed: () => [...postKeys.all, "feed"] as const,
   explore: () => [...postKeys.all, "explore"] as const,
+  videos: () => [...postKeys.all, "videos"] as const,
   user: (userId: string) => [...postKeys.all, "user", userId] as const,
   detail: (id: string) => [...postKeys.all, "detail", id] as const,
 };
@@ -35,6 +36,18 @@ export function useExplorePosts() {
   return useQuery({
     queryKey: postKeys.explore(),
     queryFn: () => postService.getExplorePosts(),
+  });
+}
+
+export function useVideoFeed() {
+  return useInfiniteQuery({
+    queryKey: postKeys.videos(),
+    queryFn: ({ pageParam = 1 }) => postService.getVideoPosts(pageParam),
+    getNextPageParam: (lastPage) => {
+      const { page, pages } = lastPage.pagination;
+      return page < pages ? page + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
 }
 

@@ -4,6 +4,7 @@ const {
   createPost,
   getFeed,
   getExplorePosts,
+  getVideoPosts,
   getPost,
   getUserPosts,
   deletePost,
@@ -18,6 +19,7 @@ const upload = require("../middleware/upload");
 // Static routes MUST come before /:id
 router.get("/feed", auth, getFeed);
 router.get("/explore", optionalAuth, getExplorePosts);
+router.get("/videos", optionalAuth, getVideoPosts);
 router.get("/user/:userId", optionalAuth, getUserPosts);
 router.post("/", auth, upload.single("image"), createPost);
 
