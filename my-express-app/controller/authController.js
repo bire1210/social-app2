@@ -7,7 +7,7 @@ const asyncHandler = require("../utils/asyncHandler");
 // @access  Public
 exports.register = asyncHandler(async (req, res) => {
   const { username, email, password, fullName } = req.body;
-  console.log(req.body);
+
   if (!username || !email || !password || !fullName) {
     throw new ApiError(400, "All fields are required");
   }
@@ -17,9 +17,10 @@ exports.register = asyncHandler(async (req, res) => {
   }
 
   const normalizedEmail = email.toLowerCase().trim();
+  const normalizedUsername = username.toLowerCase().trim();
 
   const existingUser = await User.findOne({
-    $or: [{ email: normalizedEmail }, { username }],
+    $or: [{ email: normalizedEmail }, { username: normalizedUsername }],
   });
 
   if (existingUser) {
@@ -32,7 +33,7 @@ exports.register = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({
-    username: username.trim(),
+    username: normalizedUsername,
     email: normalizedEmail,
     password,
     fullName: fullName.trim(),
@@ -54,7 +55,7 @@ exports.register = asyncHandler(async (req, res) => {
     success: true,
     token,
     user: userObj,
-  })
+  });
 });
 
 // @desc    Login user

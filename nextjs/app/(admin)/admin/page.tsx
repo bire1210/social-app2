@@ -112,7 +112,7 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge
+                  <Badge 
                     variant={user.role === "admin" ? "default" : "secondary"}
                     className="text-xs"
                   >
