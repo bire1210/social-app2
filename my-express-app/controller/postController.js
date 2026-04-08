@@ -95,11 +95,14 @@ exports.getExplorePosts = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit);
 
+  // Filter out posts with deleted/null authors
+  const validPosts = posts.filter((p) => p.author != null);
+
   const total = await Post.countDocuments();
 
   res.status(200).json({
     success: true,
-    posts,
+    posts: validPosts,
     pagination: { page, limit, total, pages: Math.ceil(total / limit) },
   });
 });

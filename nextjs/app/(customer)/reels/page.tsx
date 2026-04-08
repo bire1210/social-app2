@@ -7,9 +7,7 @@ import { UserAvatar } from "@/components/shared/UserAvatar";
 import { AuthPromptModal } from "@/components/shared/AuthPromptModal";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { UPLOADS_URL } from "@/lib/constants";
-import { Post, ReactionType } from "@/types";
 import {
-  ThumbsUp,
   MessageCircle,
   Share2,
   Heart,
@@ -19,7 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ReelsPage() {
@@ -40,7 +38,9 @@ export default function ReelsPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 
-  const posts = data?.pages.flatMap((page) => page.posts) ?? [];
+  const posts = (data?.pages.flatMap((page) => page.posts) ?? []).filter(
+    (p) => p.author != null
+  );
 
   const getVideoUrl = (path: string) => {
     if (!path) return "";

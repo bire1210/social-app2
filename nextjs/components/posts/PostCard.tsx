@@ -186,6 +186,9 @@ export function PostCard({ post }: PostCardProps) {
 
   const reactionMeta = userReaction ? REACTION_META[userReaction] : null;
 
+  // Guard against posts with a deleted/unpopulated author
+  if (!post.author) return null;
+
   return (
     <>
       <article className="bg-card rounded-xl border border-border shadow-sm">
