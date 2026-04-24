@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { useTheme } from "next-themes";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useUnreadMessageCount } from "@/hooks/useMessages";
 import {
   Home,
   Search,
@@ -33,7 +34,9 @@ export function TopNavbar() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const { data: notifData } = useNotifications();
+  const { data: msgData } = useUnreadMessageCount();
   const unreadCount = notifData?.unreadCount ?? 0;
+  const unreadMessages = msgData?.unreadCount ?? 0;
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -145,11 +148,16 @@ export function TopNavbar() {
 
           {/* Messenger */}
           <Link
-            href="/friends"
+            href="/messages"
             className="relative h-10 w-10 rounded-full bg-accent/80 flex items-center justify-center hover:bg-accent transition-colors"
-            title="Messenger"
+            title="Messages"
           >
             <MessageCircle className="h-5 w-5" />
+            {unreadMessages > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {unreadMessages > 9 ? "9+" : unreadMessages}
+              </span>
+            )}
           </Link>
 
           {/* Notifications */}

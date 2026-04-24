@@ -19,6 +19,7 @@ import {
   UserPlus,
   UserMinus,
   Settings,
+  MessageCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -103,29 +104,31 @@ export default function ProfilePage() {
                 </Button>
               </Link>
             ) : (
-              <Button
-                onClick={handleFollow}
-                disabled={followMutation.isPending}
-                variant={isFollowing ? "outline" : "default"}
-                size="sm"
-                className={`rounded-full ${
-                  !isFollowing
-                    ? "bg-linear-to-r from-blue-500 to-blue-500 text-white"
-                    : ""
-                }`}
-              >
-                {isFollowing ? (
-                  <>
-                    <UserMinus className="h-4 w-4 mr-1" />
-                    Unfollow
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="h-4 w-4 mr-1" />
-                    Follow
-                  </>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleFollow}
+                  disabled={followMutation.isPending}
+                  variant={isFollowing ? "outline" : "default"}
+                  size="sm"
+                  className={`rounded-full ${
+                    !isFollowing ? "bg-blue-500 hover:bg-blue-600 text-white" : ""
+                  }`}
+                >
+                  {isFollowing ? (
+                    <><UserMinus className="h-4 w-4 mr-1" />Unfollow</>
+                  ) : (
+                    <><UserPlus className="h-4 w-4 mr-1" />Follow</>
+                  )}
+                </Button>
+                {currentUser && (
+                  <Link href={`/messages?with=${userId}`}>
+                    <Button variant="outline" size="sm" className="rounded-full">
+                      <MessageCircle className="h-4 w-4 mr-1" />
+                      Message
+                    </Button>
+                  </Link>
                 )}
-              </Button>
+              </div>
             )}
           </div>
 

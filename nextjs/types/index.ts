@@ -89,6 +89,23 @@ export interface DashboardStats {
   totalComments: number;
 }
 
+export interface Message {
+  _id: string;
+  conversation: string;
+  sender: User;
+  content: string;
+  readBy: string[];
+  createdAt: string;
+}
+
+export interface Conversation {
+  _id: string;
+  participants: User[];
+  lastMessage?: Message;
+  lastMessageAt: string;
+  unreadCount: number;
+}
+
 export const FEELINGS = [
   { emoji: "😊", label: "happy" },
   { emoji: "😢", label: "sad" },
