@@ -18,6 +18,12 @@ const commentSchema = new mongoose.Schema(
       maxlength: [300, "Comment cannot exceed 300 characters"],
       trim: true,
     },
+    reactions: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        type: { type: String, enum: ["like", "love", "haha", "wow", "sad", "angry"] },
+      },
+    ],
   },
   {
     timestamps: true,

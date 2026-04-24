@@ -106,6 +106,23 @@ export interface Conversation {
   unreadCount: number;
 }
 
+export interface Story {
+  _id: string;
+  author: User;
+  image?: string;
+  text?: string;
+  backgroundColor: string;
+  viewers: string[];
+  expiresAt: string;
+  createdAt: string;
+}
+
+export interface StoryGroup {
+  author: User;
+  stories: Story[];
+  hasUnviewed: boolean;
+}
+
 export const FEELINGS = [
   { emoji: "😊", label: "happy" },
   { emoji: "😢", label: "sad" },

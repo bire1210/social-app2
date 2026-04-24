@@ -75,6 +75,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    birthday: {
+      type: Date,
+      default: null,
+    },
+    savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    lastActive: { type: Date, default: Date.now },
   },
   {
     timestamps: true,
