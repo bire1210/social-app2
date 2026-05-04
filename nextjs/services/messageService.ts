@@ -22,8 +22,7 @@ export const messageService = {
     return res.data;
   },
 
-  getUnreadCount: async (): Promise<{ success: boolean; unre
-adCount: number }> => {
+  getUnreadCount: async (): Promise<{ success: boolean; unreadCount: number }> => {
     const res = await api.get("/messages/unread-count");
     return res.data;
   },
