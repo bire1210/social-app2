@@ -120,7 +120,7 @@ exports.getAllUsers = asyncHandler(async (req, res) => {
     pagination: { page, limit, total, pages: Math.ceil(total / limit) },
   });
 });
-
+``
 // @desc    Delete a user (admin)
 // @route   DELETE /api/admin/users/:id
 // @access  Admin
@@ -146,9 +146,7 @@ exports.deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Toggle user role (admin)
-// @route   PUT /api/admin/users/:id/role
-// @access  Admin
+
 exports.toggleUserRole = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
 
@@ -166,9 +164,7 @@ exports.toggleUserRole = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete any post (admin)
-// @route   DELETE /api/admin/posts/:id
-// @access  Admin
+
 exports.deleteAnyPost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
 
