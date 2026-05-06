@@ -60,10 +60,10 @@ export function MobileNav() {
       {/* Top bar for mobile */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl px-4 py-3 flex items-center justify-between">
         <Link href={user ? "/" : "/explore"} className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-500 to-blue-500 flex items-center justify-center">
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-red-500 to-yellow-400 flex items-center justify-center">
             <span className="text-white font-bold text-sm">B</span>
           </div>
-          <span className="font-bold bg-linear-to-r from-blue-500 to-blue-500 bg-clip-text text-transparent">
+          <span className="font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">
             BireSocial
           </span>
         </Link>
@@ -87,7 +87,7 @@ export function MobileNav() {
                     onClick={() => setOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
                       isActive
-                        ? "bg-blue-500/10 text-blue-500"
+                        ? "bg-red-500/10 text-red-500"
                         : "text-muted-foreground hover:bg-accent"
                     }`}
                   >
@@ -112,7 +112,7 @@ export function MobileNav() {
                   <Link
                     href="/login"
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-blue-500 hover:bg-blue-500/10"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-500 hover:bg-red-500/10"
                   >
                     <LogIn className="h-5 w-5" />
                     <span className="font-medium">Sign In</span>
@@ -145,11 +145,11 @@ export function MobileNav() {
               >
                 {/* Active indicator line on top */}
                 {active && (
-                  <span className="absolute top-0 left-2 right-2 h-[3px] rounded-b-full bg-blue-500" />
+                  <span className="absolute top-0 left-2 right-2 h-[3px] rounded-b-full bg-gradient-to-r from-red-500 to-yellow-400" />
                 )}
                 <item.icon
                   className={`h-6 w-6 transition-colors ${
-                    active ? "text-blue-500" : "text-muted-foreground"
+                    active ? "text-red-500" : "text-muted-foreground"
                   }`}
                   {...(active && item.icon === Home ? { fill: "currentColor" } : {})}
                 />

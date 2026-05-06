@@ -19,7 +19,7 @@ export function UserAvatar({ src, fallback, className }: UserAvatarProps) {
   return (
     <Avatar className={className}>
       <AvatarImage src={src ? getImageUrl(src) : undefined} alt={fallback} />
-      <AvatarFallback className="bg-linear-to-br from-blue-500 to-blue-500 text-white font-semibold text-sm">
+      <AvatarFallback className="bg-gradient-to-br from-red-500 to-yellow-400 text-white font-semibold text-sm">
         {fallback.charAt(0).toUpperCase()}
       </AvatarFallback>
     </Avatar>

@@ -34,7 +34,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left side — branding */}
-      <div className="hidden lg:flex flex-1 items-center justify-center bg-linear-to-b from-blue-500 relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-red-500 to-yellow-400 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.1),transparent_60%)]" />
         <div className="relative z-10 text-center px-12">
           <div className="h-20 w-20 rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6">
@@ -53,7 +53,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm space-y-8">
           {/* Mobile logo */}
           <div className="lg:hidden text-center">
-            <div className="h-14 w-14 rounded-2xl bg-linear-to-br from-blue-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-red-500 to-yellow-400 flex items-center justify-center mx-auto mb-4">
               <span className="text-white font-bold text-2xl">B</span>
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11 rounded-xl bg-linear-to-r from-blue-500 to-blue-500 hover:from-blue-600 hover:to-blue-600 text-white font-medium"
+              className="w-full h-11 rounded-xl bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white font-medium"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -106,7 +106,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="text-blue-500 hover:text-blue-500 font-medium"
+              className="text-red-500 hover:text-red-600 font-medium"
             >
               Create one
             </Link>

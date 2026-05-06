@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
                     {user.role === "admin" ? (
                       <ShieldOff className="h-4 w-4 text-amber-400" />
                     ) : (
-                      <Shield className="h-4 w-4 text-blue-500" />
+                      <Shield className="h-4 w-4 text-red-500" />
                     )}
                   </Button>
                   <Button

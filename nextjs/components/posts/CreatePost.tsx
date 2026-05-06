@@ -111,7 +111,7 @@ export function CreatePost() {
                     setExpanded(true);
                   }}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-accent transition-colors text-xs ${
-                    selectedFeeling?.label === f.label ? "bg-blue-500/10 text-blue-500" : ""
+                    selectedFeeling?.label === f.label ? "bg-red-500/10 text-red-500" : ""
                   }`}
                 >
                   <span className="text-xl">{f.emoji}</span>
@@ -157,7 +157,7 @@ export function CreatePost() {
             <Button
               onClick={handleSubmit}
               disabled={createPost.isPending || (!content.trim() && !image)}
-              className="rounded-lg bg-blue-500 hover:bg-blue-600 text-white px-6"
+              className="rounded-lg bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white px-6"
               size="sm"
             >
               {createPost.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Post"}

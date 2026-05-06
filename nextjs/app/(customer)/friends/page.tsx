@@ -69,7 +69,7 @@ function PersonCard({ person }: { person: User }) {
               className={`flex-1 rounded-lg text-xs ${
                 isFollowing
                   ? "bg-accent text-foreground hover:bg-accent/80"
-                  : "bg-blue-500 hover:bg-blue-600 text-white"
+                  : "bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white"
               }`}
             >
               {isFollowing ? (
@@ -105,8 +105,8 @@ export default function FriendsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-          <Users className="h-5 w-5 text-blue-500" />
+        <div className="h-10 w-10 rounded-full bg-red-500/10 flex items-center justify-center">
+          <Users className="h-5 w-5 text-red-500" />
         </div>
         <div>
           <h1 className="text-xl font-bold">People You May Know</h1>

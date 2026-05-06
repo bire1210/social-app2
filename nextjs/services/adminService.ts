@@ -3,8 +3,11 @@ import { DashboardStats, User, Post } from "@/types";
 
 export const adminService = {
   getDashboard: async (): Promise<{
+    success: boolean;
     stats: DashboardStats;
     recentUsers: User[];
+    recentPosts: Post[];
+    signupChart: { date: string; count: number }[];
   }> => {
     const res = await api.get("/admin/stats");
     return res.data;

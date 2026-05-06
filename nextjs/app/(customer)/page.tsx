@@ -66,7 +66,7 @@ function AuthenticatedFeed() {
           <button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            className="w-full py-3 text-sm text-blue-500 hover:text-blue-600 transition-colors bg-card rounded-xl border border-border font-medium"
+            className="w-full py-3 text-sm text-red-500 hover:text-red-600 transition-colors bg-card rounded-xl border border-border font-medium"
           >
             {isFetchingNextPage ? "Loading..." : "Load more posts"}
           </button>

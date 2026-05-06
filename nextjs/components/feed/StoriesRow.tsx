@@ -229,8 +229,8 @@ function CreateStoryModal({ onClose }: { onClose: () => void }) {
               onClick={() => setMode("text")}
               className="w-full flex items-center gap-3 p-4 rounded-xl bg-accent/60 hover:bg-accent transition-colors"
             >
-              <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                <Type className="h-5 w-5 text-blue-500" />
+              <div className="h-10 w-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                <Type className="h-5 w-5 text-red-500" />
               </div>
               <div className="text-left">
                 <p className="font-semibold text-sm">Text story</p>
@@ -251,7 +251,7 @@ function CreateStoryModal({ onClose }: { onClose: () => void }) {
               placeholder="Add text to your story..."
               maxLength={200}
               rows={2}
-              className="w-full rounded-xl bg-accent/60 px-3 py-2 text-sm resize-none outline-none focus:ring-2 focus:ring-blue-500/30"
+              className="w-full rounded-xl bg-accent/60 px-3 py-2 text-sm resize-none outline-none focus:ring-2 focus:ring-red-500/30"
             />
             <div className="flex gap-2">
               <button onClick={() => { setMode("pick"); setImageFile(null); setImagePreview(null); }} className="flex-1 py-2 rounded-xl border border-border text-sm font-medium hover:bg-accent">
@@ -260,7 +260,7 @@ function CreateStoryModal({ onClose }: { onClose: () => void }) {
               <button
                 onClick={handleSubmit}
                 disabled={createStory.isPending}
-                className="flex-1 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium flex items-center justify-center gap-2"
+                className="flex-1 py-2 rounded-xl bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white text-sm font-medium flex items-center justify-center gap-2"
               >
                 {createStory.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Share Story"}
               </button>
@@ -284,7 +284,7 @@ function CreateStoryModal({ onClose }: { onClose: () => void }) {
               placeholder="What's on your mind?"
               maxLength={200}
               rows={2}
-              className="w-full rounded-xl bg-accent/60 px-3 py-2 text-sm resize-none outline-none focus:ring-2 focus:ring-blue-500/30"
+              className="w-full rounded-xl bg-accent/60 px-3 py-2 text-sm resize-none outline-none focus:ring-2 focus:ring-red-500/30"
               autoFocus
             />
             <div className="flex gap-2 flex-wrap">
@@ -304,7 +304,7 @@ function CreateStoryModal({ onClose }: { onClose: () => void }) {
               <button
                 onClick={handleSubmit}
                 disabled={createStory.isPending || !text.trim()}
-                className="flex-1 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-2 rounded-xl bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {createStory.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Share Story"}
               </button>
@@ -372,7 +372,7 @@ export function StoriesRow() {
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
             </div>
             <div className="h-[35%] bg-card flex flex-col items-center justify-end pb-3 relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 h-9 w-9 rounded-full bg-blue-500 border-4 border-card flex items-center justify-center">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 h-9 w-9 rounded-full bg-gradient-to-br from-red-500 to-yellow-400 border-4 border-card flex items-center justify-center">
                 <Plus className="h-4 w-4 text-white" />
               </div>
               <span className="text-xs font-semibold text-center mt-1">Create story</span>

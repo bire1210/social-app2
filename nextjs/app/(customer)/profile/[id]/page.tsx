@@ -77,7 +77,7 @@ export default function ProfilePage() {
     <>
       <div className="space-y-6">
         {/* Cover Image */}
-        <div className="relative h-40 rounded-2xl overflow-hidden bg-linear-to-r from-blue-500/20 to-blue-500/20">
+        <div className="relative h-40 rounded-2xl overflow-hidden bg-gradient-to-r from-red-500/20 to-yellow-400/20">
           {profile.coverImage && (
             <img
               src={getImageUrl(profile.coverImage)}
@@ -111,7 +111,7 @@ export default function ProfilePage() {
                   variant={isFollowing ? "outline" : "default"}
                   size="sm"
                   className={`rounded-full ${
-                    !isFollowing ? "bg-blue-500 hover:bg-blue-600 text-white" : ""
+                    !isFollowing ? "bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white" : ""
                   }`}
                 >
                   {isFollowing ? (
@@ -152,7 +152,7 @@ export default function ProfilePage() {
                   href={profile.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-blue-500 hover:underline"
+                  className="flex items-center gap-1 text-red-500 hover:underline"
                 >
                   <LinkIcon className="h-3.5 w-3.5" />
                   Website

@@ -37,7 +37,7 @@ interface PostCardProps {
 }
 
 const REACTION_META: Record<ReactionType, { emoji: string; label: string; color: string }> = {
-  like: { emoji: "👍", label: "Like", color: "text-blue-500" },
+  like: { emoji: "👍", label: "Like", color: "text-red-500" },
   love: { emoji: "❤️", label: "Love", color: "text-red-500" },
   haha: { emoji: "😂", label: "Haha", color: "text-yellow-500" },
   wow: { emoji: "😮", label: "Wow", color: "text-yellow-500" },
@@ -248,7 +248,7 @@ export function PostCard({ post }: PostCardProps) {
                 <span className="text-xs text-muted-foreground">{editContent.length}/500</span>
                 <div className="flex gap-2">
                   <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>Cancel</Button>
-                  <Button size="sm" onClick={handleEdit} disabled={editPost.isPending || !editContent.trim()} className="bg-blue-500 hover:bg-blue-600 text-white">
+                  <Button size="sm" onClick={handleEdit} disabled={editPost.isPending || !editContent.trim()} className="bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white">
                     {editPost.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
                   </Button>
                 </div>
@@ -374,13 +374,13 @@ export function PostCard({ post }: PostCardProps) {
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Write a comment..."
-                    className="w-full h-9 rounded-full bg-accent/80 px-4 pr-10 text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                    className="w-full h-9 rounded-full bg-accent/80 px-4 pr-10 text-sm outline-none focus:ring-2 focus:ring-red-500/30"
                     maxLength={300}
                   />
                   <button
                     type="submit"
                     disabled={!commentText.trim() || addComment.isPending}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 disabled:text-muted-foreground"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 disabled:text-muted-foreground"
                   >
                     {addComment.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </button>

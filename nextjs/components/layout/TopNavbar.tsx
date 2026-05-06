@@ -77,7 +77,7 @@ export function TopNavbar() {
         {/* Left — Logo + Search */}
         <div className="flex items-center gap-2 min-w-[240px]">
           <Link href={user ? "/" : "/explore"} className="shrink-0">
-            <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-red-500 to-yellow-400 flex items-center justify-center">
               <span className="text-white font-bold text-xl">B</span>
             </div>
           </Link>
@@ -93,7 +93,7 @@ export function TopNavbar() {
                 }
               }}
               placeholder="Search BireSocial"
-              className="h-10 w-[220px] rounded-full bg-accent/80 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500/30 transition-all"
+              className="h-10 w-[220px] rounded-full bg-accent/80 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-red-500/30 transition-all"
             />
           </div>
         </div>
@@ -112,7 +112,7 @@ export function TopNavbar() {
                 title={item.label}
                 className={`relative flex items-center justify-center h-14 w-[80px] lg:w-[100px] border-b-[3px] transition-all duration-150 group ${
                   isActive
-                    ? "border-blue-500 text-blue-500"
+                    ? "border-red-500 text-red-500"
                     : "border-transparent text-muted-foreground hover:bg-accent"
                 }`}
               >
@@ -202,7 +202,7 @@ export function TopNavbar() {
                     <UserAvatar src={user.avatar} fallback={user.fullName} className="h-14 w-14" />
                     <div>
                       <p className="font-semibold">{user.fullName}</p>
-                      <p className="text-xs text-blue-500 mt-0.5">See your profile</p>
+                      <p className="text-xs text-red-500 mt-0.5">See your profile</p>
                     </div>
                   </Link>
 
@@ -238,7 +238,7 @@ export function TopNavbar() {
           ) : (
             <Link
               href="/login"
-              className="h-9 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors flex items-center"
+              className="h-9 px-4 rounded-lg bg-gradient-to-r from-red-500 to-yellow-400 text-white text-sm font-medium hover:from-red-600 hover:to-yellow-500 transition-colors flex items-center"
             >
               Sign In
             </Link>

@@ -14,8 +14,8 @@ const notificationIcons = {
   like: { icon: Heart, color: "text-rose-500", bg: "bg-rose-500/10" },
   comment: {
     icon: MessageCircle,
-    color: "text-blue-500",
-    bg: "bg-blue-500/10",
+    color: "text-red-500",
+    bg: "bg-red-500/10",
   },
   follow: { icon: UserPlus, color: "text-emerald-500", bg: "bg-emerald-500/10" },
   reaction: { icon: Heart, color: "text-orange-500", bg: "bg-orange-500/10" },
@@ -71,7 +71,7 @@ export default function NotificationsPage() {
             size="sm"
             onClick={handleMarkAllRead}
             disabled={markAllRead.isPending}
-            className="text-blue-500 hover:text-blue-500"
+            className="text-red-500 hover:text-red-600"
           >
             <Check className="h-4 w-4 mr-1" />
             Mark all read

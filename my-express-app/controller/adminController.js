@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
+const Story = require("../models/Story");
+const Message = require("../models/Message");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 
@@ -8,16 +10,74 @@ const ApiError = require("../utils/ApiError");
 // @route   GET /api/admin/stats
 // @access  Admin
 exports.getDashboardStats = asyncHandler(async (req, res) => {
-  const [totalUsers, totalPosts, totalComments, recentUsers] =
-    await Promise.all([
-      User.countDocuments(),
-      Post.countDocuments(),
-      Comment.countDocuments(),
-      User.find()
-        .sort({ createdAt: -1 })
-        .limit(5)
-        .select("username fullName avatar createdAt role"),
-    ]);
+  const now = new Date();
+  const last7Days = new Date(now - 7 * 24 * 60 * 60 * 1000);
+  const last30Days = new Date(now - 30 * 24 * 60 * 60 * 1000);
+  const prevMonth = new Date(now - 60 * 24 * 60 * 60 * 1000);
+
+  const [
+    totalUsers,
+    totalPosts,
+    totalComments,
+    totalStories,
+    totalMessages,
+    newUsersThisMonth,
+    newUsersPrevMonth,
+    newPostsThisMonth,
+    newPostsPrevMonth,
+    recentUsers,
+    recentPosts,
+    // Daily signups for last 7 days
+    dailySignups,
+  ] = await Promise.all([
+    User.countDocuments(),
+    Post.countDocuments(),
+    Comment.countDocuments(),
+    Story.countDocuments(),
+    Message.countDocuments(),
+    User.countDocuments({ createdAt: { $gte: last30Days } }),
+    User.countDocuments({ createdAt: { $gte: prevMonth, $lt: last30Days } }),
+    Post.countDocuments({ createdAt: { $gte: last30Days } }),
+    Post.countDocuments({ createdAt: { $gte: prevMonth, $lt: last30Days } }),
+    User.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("username fullName avatar createdAt role email"),
+    Post.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate("author", "username fullName avatar")
+      .select("content author createdAt likes"),
+    User.aggregate([
+      { $match: { createdAt: { $gte: last7Days } } },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]),
+  ]);
+
+  // Build last 7 days array with zeros for missing days
+  const signupMap = {};
+  dailySignups.forEach((d) => { signupMap[d._id] = d.count; });
+  const signupChart = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now - i * 24 * 60 * 60 * 1000);
+    const key = d.toISOString().split("T")[0];
+    signupChart.push({ date: key, count: signupMap[key] || 0 });
+  }
+
+  const userGrowth = newUsersPrevMonth > 0
+    ? Math.round(((newUsersThisMonth - newUsersPrevMonth) / newUsersPrevMonth) * 100)
+    : 100;
+  const postGrowth = newPostsPrevMonth > 0
+    ? Math.round(((newPostsThisMonth - newPostsPrevMonth) / newPostsPrevMonth) * 100)
+    : 100;
 
   res.status(200).json({
     success: true,
@@ -25,8 +85,16 @@ exports.getDashboardStats = asyncHandler(async (req, res) => {
       totalUsers,
       totalPosts,
       totalComments,
+      totalStories,
+      totalMessages,
+      newUsersThisMonth,
+      newPostsThisMonth,
+      userGrowth,
+      postGrowth,
     },
     recentUsers,
+    recentPosts,
+    signupChart,
   });
 });
 

@@ -51,7 +51,7 @@ function SuggestedUserCard({ suggestedUser }: { suggestedUser: User }) {
         className={`text-xs h-8 rounded-lg ${
           isFollowing
             ? ""
-            : "bg-blue-500 hover:bg-blue-600 text-white"
+            : "bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white"
         }`}
       >
         {isFollowing ? "Following" : "Follow"}
@@ -84,7 +84,7 @@ export function RightSidebar() {
               <p className="text-xs text-muted-foreground mt-0.5">
                 Unlock exclusive features and badges
               </p>
-              <p className="text-xs text-blue-500 mt-1">biresocial.app</p>
+              <p className="text-xs text-red-500 mt-1">biresocial.app</p>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ export function RightSidebar() {
           </h3>
           <Link
             href="/explore"
-            className="text-xs text-blue-500 hover:text-blue-600 font-medium"
+            className="text-xs text-red-500 hover:text-red-600 font-medium"
           >
             See All
           </Link>

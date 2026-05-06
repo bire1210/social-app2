@@ -46,7 +46,7 @@ export default function ExplorePage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search users..."
-          className="pl-10 rounded-xl bg-accent/50 border-0 focus-visible:ring-1 focus-visible:ring-blue-500"
+          className="pl-10 rounded-xl bg-accent/50 border-0 focus-visible:ring-1 focus-visible:ring-red-500"
         />
       </div>
 

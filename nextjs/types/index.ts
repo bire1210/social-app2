@@ -87,6 +87,12 @@ export interface DashboardStats {
   totalUsers: number;
   totalPosts: number;
   totalComments: number;
+  totalStories: number;
+  totalMessages: number;
+  newUsersThisMonth: number;
+  newPostsThisMonth: number;
+  userGrowth: number;
+  postGrowth: number;
 }
 
 export interface Message {

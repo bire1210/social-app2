@@ -96,7 +96,7 @@ export function Sidebar() {
                 <div
                   className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 ${
                     isActive
-                      ? "bg-blue-500 text-white"
+                      ? "bg-gradient-to-br from-red-500 to-yellow-400 text-white"
                       : "bg-accent/80 text-foreground"
                   }`}
                 >
@@ -176,9 +176,9 @@ export function Sidebar() {
         <div className="mt-4 pt-4 border-t border-border space-y-1">
           <Link
             href="/login"
-            className="flex items-center gap-3 px-2 py-2 rounded-lg text-blue-500 hover:bg-blue-500/10 transition-all w-full"
+            className="flex items-center gap-3 px-2 py-2 rounded-lg text-red-500 hover:bg-red-500/10 transition-all w-full"
           >
-            <div className="h-9 w-9 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+            <div className="h-9 w-9 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
               <LogIn className="h-5 w-5" />
             </div>
             <span className="text-sm font-medium">Sign In</span>

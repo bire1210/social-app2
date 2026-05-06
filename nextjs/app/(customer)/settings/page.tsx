@@ -176,7 +176,7 @@ export default function SettingsPage() {
         <Button
           type="submit"
           disabled={updateProfile.isPending}
-          className="rounded-full bg-blue-500 hover:bg-blue-600 text-white px-8"
+          className="rounded-full bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white px-8"
         >
           {updateProfile.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
           Save Changes

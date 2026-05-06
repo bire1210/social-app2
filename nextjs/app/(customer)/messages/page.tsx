@@ -68,7 +68,7 @@ function ConversationList({
             <div className="relative shrink-0">
               <UserAvatar src={other?.avatar} fallback={other?.fullName ?? "?"} className="h-12 w-12" />
               {conv.unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gradient-to-br from-red-500 to-yellow-400 text-white text-[10px] font-bold flex items-center justify-center">
                   {conv.unreadCount > 9 ? "9+" : conv.unreadCount}
                 </span>
               )}
@@ -155,7 +155,7 @@ function ChatWindow({ conversation }: { conversation: Conversation }) {
                 <div
                   className={`max-w-[70%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
                     isMe
-                      ? "bg-blue-500 text-white rounded-br-sm"
+                      ? "bg-gradient-to-r from-red-500 to-yellow-400 text-white rounded-br-sm"
                       : "bg-accent rounded-bl-sm"
                   }`}
                 >
@@ -177,12 +177,12 @@ function ChatWindow({ conversation }: { conversation: Conversation }) {
             onChange={(e) => setText(e.target.value)}
             placeholder="Aa"
             maxLength={2000}
-            className="w-full h-9 rounded-full bg-accent/80 px-4 pr-10 text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+            className="w-full h-9 rounded-full bg-accent/80 px-4 pr-10 text-sm outline-none focus:ring-2 focus:ring-red-500/30"
           />
           <button
             type="submit"
             disabled={!text.trim() || sendMessage.isPending}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 disabled:text-muted-foreground transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 disabled:text-muted-foreground transition-colors"
           >
             {sendMessage.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -221,7 +221,7 @@ function NewMessagePanel({ onConversationCreated }: { onConversationCreated: (co
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search people..."
-          className="pl-9 rounded-full bg-accent/60 border-0 focus-visible:ring-1 focus-visible:ring-blue-500"
+          className="pl-9 rounded-full bg-accent/60 border-0 focus-visible:ring-1 focus-visible:ring-red-500"
           autoFocus
         />
       </div>
@@ -327,7 +327,7 @@ export default function MessagesPage() {
             </p>
             <Button
               onClick={() => setShowNew(true)}
-              className="mt-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6"
+              className="mt-4 bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white rounded-full px-6"
             >
               Send a message
             </Button>

@@ -51,7 +51,7 @@ export function AuthPromptModal({
 
         {/* Content */}
         <div className="text-center space-y-4">
-          <div className="h-14 w-14 rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-red-500 to-yellow-400 flex items-center justify-center mx-auto">
             <span className="text-white font-bold text-2xl">V</span>
           </div>
 
@@ -63,7 +63,7 @@ export function AuthPromptModal({
           <div className="space-y-2">
             <Button
               onClick={() => router.push("/login")}
-              className="w-full h-11 rounded-xl bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium"
+              className="w-full h-11 rounded-xl bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white font-medium"
             >
               <LogIn className="h-4 w-4 mr-2" />
               Sign In

@@ -67,7 +67,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left — branding */}
-      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-red-500 to-yellow-400 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(255,255,255,0.1),transparent_60%)]" />
         <div className="relative z-10 text-center px-12">
           <div className="h-20 w-20 rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6">
@@ -84,7 +84,7 @@ export default function RegisterPage() {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-sm space-y-6">
           <div className="lg:hidden text-center">
-            <div className="h-14 w-14 rounded-2xl bg-blue-500 flex items-center justify-center mx-auto mb-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-red-500 to-yellow-400 flex items-center justify-center mx-auto mb-4">
               <span className="text-white font-bold text-2xl">B</span>
             </div>
           </div>
@@ -175,7 +175,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium"
+              className="w-full h-11 rounded-xl bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white font-medium"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               Create Account
@@ -184,7 +184,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-500 font-medium hover:underline">
+            <Link href="/login" className="text-red-500 font-medium hover:underline">
               Sign in
             </Link>
           </p>

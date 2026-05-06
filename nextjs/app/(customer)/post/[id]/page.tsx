@@ -17,7 +17,7 @@ export default function PostDetailPage() {
     return (
       <div className="text-center py-20">
         <p className="text-muted-foreground text-lg">Post not found</p>
-        <Link href="/" className="text-blue-500 hover:underline text-sm mt-2 inline-block">
+        <Link href="/" className="text-red-500 hover:underline text-sm mt-2 inline-block">
           Go back home
         </Link>
       </div>
