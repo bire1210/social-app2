@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "next-themes";
-import { Loader2, Moon, Sun, Camera, ImagePlus } from "lucide-react";
+import { Loader2, Moon, Sun, Camera, ImagePlus, Shield } from "lucide-react";
 import { UPLOADS_URL } from "@/lib/constants";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 export default function SettingsPage() {
@@ -185,30 +186,20 @@ export default function SettingsPage() {
 
       <Separator />
 
-      {/* Appearance */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Appearance</h2>
-        <div className="flex items-center gap-3">
-          <Button
-            variant={theme === "light" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTheme("light")}
-            className="rounded-xl"
-          >
-            <Sun className="h-4 w-4 mr-2" />
-            Light
-          </Button>
-          <Button
-            variant={theme === "dark" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTheme("dark")}
-            className="rounded-xl"
-          >
-            <Moon className="h-4 w-4 mr-2" />
-            Dark
-          </Button>
+      {/* Admin Dashboard */}
+      {user.role === "admin" && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Shield className="h-5 w-5 text-red-500" />
+            Admin
+          </h2>
+          <Link href="/admin">
+            <Button className="w-full rounded-xl bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white">
+              Go to Dashboard
+            </Button>
+          </Link>
         </div>
-      </div>
+      )}
     </div>
   );
 }
