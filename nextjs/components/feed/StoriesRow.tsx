@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useStories, useCreateStory, useViewStory, useDeleteStory } from "@/hooks/useStories";
 import { UserAvatar } from "@/components/shared/UserAvatar";
@@ -43,6 +43,7 @@ function StoryViewer({
   const deleteStory = useDeleteStory();
   const [groupIdx, setGroupIdx] = useState(startGroupIndex);
   const [storyIdx, setStoryIdx] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   const group = groups[groupIdx];
   const story = group?.stories[storyIdx];
@@ -57,6 +58,7 @@ function StoryViewer({
 
   const goNext = () => {
     viewStory.mutate(story._id);
+    setProgress(0);
     if (storyIdx < group.stories.length - 1) {
       setStoryIdx(storyIdx + 1);
     } else if (groupIdx < groups.length - 1) {
@@ -68,6 +70,7 @@ function StoryViewer({
   };
 
   const goPrev = () => {
+    setProgress(0);
     if (storyIdx > 0) {
       setStoryIdx(storyIdx - 1);
     } else if (groupIdx > 0) {
@@ -86,6 +89,34 @@ function StoryViewer({
     }
   };
 
+  // Auto-play timer: 5 seconds per story
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((p) => p + (100 / 50)); // 50 ticks = 5 seconds
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // When progress reaches 100, advance to next story
+  useEffect(() => {
+    if (progress >= 100) {
+      const timer = setTimeout(() => {
+        viewStory.mutate(story._id);
+        setProgress(0);
+        if (storyIdx < group.stories.length - 1) {
+          setStoryIdx(storyIdx + 1);
+        } else if (groupIdx < groups.length - 1) {
+          setGroupIdx(groupIdx + 1);
+          setStoryIdx(0);
+        } else {
+          onClose();
+        }
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [progress]);
+
   return (
     <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={onClose}>
       <div
@@ -98,7 +129,11 @@ function StoryViewer({
           {group.stories.map((_, i) => (
             <div key={i} className="flex-1 h-1 rounded-full bg-white/30 overflow-hidden">
               <div
-                className={`h-full bg-white rounded-full transition-all duration-300 ${i < storyIdx ? "w-full" : i === storyIdx ? "w-1/2" : "w-0"}`}
+                className="h-full bg-white rounded-full transition-all"
+                style={{
+                  width: i < storyIdx ? "100%" : i === storyIdx ? `${progress}%` : "0%",
+                  transitionDuration: i === storyIdx ? "0ms" : "300ms",
+                }}
               />
             </div>
           ))}
