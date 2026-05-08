@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FEELINGS } from "@/types";
 import { ImagePlus, X, Loader2, Video, Smile } from "lucide-react";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 export function CreatePost() {
   const { user } = useAuth();
@@ -169,10 +170,10 @@ export function CreatePost() {
       <div className="border-t border-border mx-3 mt-3" />
 
       <div className="flex items-center px-2 py-1">
-        <button onClick={() => { toast("Live video coming soon! 🎥"); }} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-accent transition-colors">
+        <Link href="/live" className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg hover:bg-accent transition-colors">
           <Video className="h-5 w-5 text-red-500" />
           <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Live video</span>
-        </button>
+        </Link>
 
         <input ref={fileRef} type="file" accept="image/*,video/*" onChange={handleImageSelect} className="hidden" />
         <input ref={videoRef} type="file" accept="video/*" onChange={handleImageSelect} className="hidden" />

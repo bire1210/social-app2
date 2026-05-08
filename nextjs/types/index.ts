@@ -129,6 +129,48 @@ export interface StoryGroup {
   hasUnviewed: boolean;
 }
 
+export interface LiveStream {
+  _id: string;
+  streamer: User;
+  title: string;
+  description: string;
+  thumbnail: string;
+  isLive: boolean;
+  viewers: string[];
+  viewerCount: number;
+  likes: string[];
+  comments: Array<{
+    author: User;
+    content: string;
+    createdAt: string;
+  }>;
+  startedAt: string;
+  endedAt: string | null;
+  createdAt: string;
+}
+
+export interface LiveStream {
+  _id: string;
+  streamer: User;
+  title: string;
+  description: string;
+  thumbnail: string;
+  streamUrl: string;
+  status: "live" | "ended";
+  viewers: User[];
+  viewerCount: number;
+  likes: string[];
+  comments: Array<{
+    author: User;
+    content: string;
+    createdAt: string;
+  }>;
+  startedAt: string;
+  endedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const FEELINGS = [
   { emoji: "😊", label: "happy" },
   { emoji: "😢", label: "sad" },

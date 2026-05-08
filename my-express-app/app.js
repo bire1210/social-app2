@@ -13,6 +13,8 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const storyRoutes = require("./routes/storyRoutes");
+const liveStreamRoutes = require("./routes/liveStreamRoutes");
+const liveStreamRoutes = require("./routes/liveStreamRoutes");
 
 const app = express();
 
@@ -45,6 +47,8 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/stories", storyRoutes);
+app.use("/api/live", liveStreamRoutes);
+app.use("/api/live", liveStreamRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
