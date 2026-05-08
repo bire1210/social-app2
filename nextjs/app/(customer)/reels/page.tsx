@@ -326,9 +326,20 @@ export default function ReelsPage() {
 
             {/* Comments Section at Bottom */}
             {showComments && selectedPostId === post._id && (
-              <div className="bg-black/95 border-t border-white/10 p-4 max-h-[40vh] overflow-y-auto">
+              <div className="bg-black/95 border-t border-white/10 p-4 max-h-[40vh] overflow-y-auto relative">
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowComments(false)}
+                  className="absolute top-2 right-2 text-white/50 hover:text-white transition-colors"
+                  title="Close comments"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
                 {/* Comments List */}
-                <div className="space-y-3 mb-4">
+                <div className="space-y-3 mb-4 pr-6">
                   {post.comments && post.comments.length > 0 ? (
                     post.comments.map((comment: any) => (
                       <div key={comment._id} className="flex items-start gap-2 group">
