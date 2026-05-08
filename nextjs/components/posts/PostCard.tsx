@@ -8,6 +8,7 @@ import { useComments, useAddComment, useDeleteComment } from "@/hooks/useComment
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { AuthPromptModal } from "@/components/shared/AuthPromptModal";
 import { ReactionPicker } from "@/components/posts/ReactionPicker";
+import { ShareModal } from "@/components/posts/ShareModal";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { UPLOADS_URL } from "@/lib/constants";
@@ -59,6 +60,7 @@ export function PostCard({ post }: PostCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [userReaction, setUserReaction] = useState<ReactionType | null>(
@@ -135,9 +137,7 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   const handleShare = () => {
-    const url = `${window.location.origin}/post/${post._id}`;
-    navigator.clipboard.writeText(url);
-    toast.success("Link copied!");
+    setShowShareModal(true);
   };
 
   const handleDelete = async () => {
@@ -430,6 +430,12 @@ export function PostCard({ post }: PostCardProps) {
         open={showAuthPrompt}
         onClose={() => setShowAuthPrompt(false)}
         message="Sign in to react, comment, and interact with posts"
+      />
+
+      <ShareModal
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        postId={post._id}
       />
     </>
   );
