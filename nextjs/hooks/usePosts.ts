@@ -15,6 +15,7 @@ export const postKeys = {
   explore: () => [...postKeys.all, "explore"] as const,
   videos: () => [...postKeys.all, "videos"] as const,
   user: (userId: string) => [...postKeys.all, "user", userId] as const,
+  liked: (userId: string) => [...postKeys.all, "liked", userId] as const,
   detail: (id: string) => [...postKeys.all, "detail", id] as const,
 };
 
@@ -55,6 +56,14 @@ export function useUserPosts(userId: string) {
   return useQuery({
     queryKey: postKeys.user(userId),
     queryFn: () => postService.getUserPosts(userId),
+    enabled: !!userId,
+  });
+}
+
+export function useUserLikedPosts(userId: string) {
+  return useQuery({
+    queryKey: postKeys.liked(userId),
+    queryFn: () => postService.getUserLikedPosts(userId),
     enabled: !!userId,
   });
 }

@@ -34,6 +34,11 @@ export const postService = {
     return res.data;
   },
 
+  getUserLikedPosts: async (userId: string, page = 1): Promise<{ success: boolean; posts: Post[]; pagination: Pagination }> => {
+    const res = await api.get(`/posts/user/${userId}/liked?page=${page}`);
+    return res.data;
+  },
+
   deletePost: async (id: string): Promise<void> => {
     await api.delete(`/posts/${id}`);
   },

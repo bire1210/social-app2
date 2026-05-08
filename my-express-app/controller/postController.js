@@ -91,6 +91,11 @@ exports.getExplorePosts = asyncHandler(async (req, res) => {
 
   const posts = await Post.find()
     .populate("author", "username fullName avatar")
+    .populate({
+      path: "comments",
+      options: { limit: 3, sort: { createdAt: -1 } },
+      populate: { path: "author", select: "username fullName avatar" },
+    })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
@@ -100,9 +105,19 @@ exports.getExplorePosts = asyncHandler(async (req, res) => {
 
   const total = await Post.countDocuments();
 
+  // Attach userReaction if user is authenticated
+  const postsWithReaction = validPosts.map((post) => {
+    const obj = post.toObject({ virtuals: true });
+    if (req.user) {
+      const r = post.reactions.find((r) => r.user.toString() === req.user._id.toString());
+      obj.userReaction = r ? r.type : null;
+    }
+    return obj;
+  });
+
   res.status(200).json({
     success: true,
-    posts: validPosts,
+    posts: postsWithReaction,
     pagination: { page, limit, total, pages: Math.ceil(total / limit) },
   });
 });
@@ -119,6 +134,11 @@ exports.getVideoPosts = asyncHandler(async (req, res) => {
 
   const posts = await Post.find(filter)
     .populate("author", "username fullName avatar")
+    .populate({
+      path: "comments",
+      options: { limit: 3, sort: { createdAt: -1 } },
+      populate: { path: "author", select: "username fullName avatar" },
+    })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
@@ -158,9 +178,15 @@ exports.getPost = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Post not found");
   }
 
+  const obj = post.toObject({ virtuals: true });
+  if (req.user) {
+    const r = post.reactions.find((r) => r.user.toString() === req.user._id.toString());
+    obj.userReaction = r ? r.type : null;
+  }
+
   res.status(200).json({
     success: true,
-    post,
+    post: obj,
   });
 });
 
@@ -174,15 +200,30 @@ exports.getUserPosts = asyncHandler(async (req, res) => {
 
   const posts = await Post.find({ author: req.params.userId })
     .populate("author", "username fullName avatar")
+    .populate({
+      path: "comments",
+      options: { limit: 3, sort: { createdAt: -1 } },
+      populate: { path: "author", select: "username fullName avatar" },
+    })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
 
   const total = await Post.countDocuments({ author: req.params.userId });
 
+  // Attach userReaction if user is authenticated
+  const postsWithReaction = posts.map((post) => {
+    const obj = post.toObject({ virtuals: true });
+    if (req.user) {
+      const r = post.reactions.find((r) => r.user.toString() === req.user._id.toString());
+      obj.userReaction = r ? r.type : null;
+    }
+    return obj;
+  });
+
   res.status(200).json({
     success: true,
-    posts,
+    posts: postsWithReaction,
     pagination: { page, limit, total, pages: Math.ceil(total / limit) },
   });
 });
@@ -329,5 +370,50 @@ exports.toggleLike = asyncHandler(async (req, res) => {
     success: true,
     isLiked: userReaction === "like",
     userReaction,
+  });
+});
+// @desc    Get posts liked by a specific user
+// @route   GET /api/posts/user/:userId/liked
+// @access  Public (optional auth)
+exports.getUserLikedPosts = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const posts = await Post.find({
+    reactions: {
+      $elemMatch: { user: req.params.userId }
+    }
+  })
+    .populate("author", "username fullName avatar")
+    .populate({
+      path: "comments",
+      options: { limit: 3, sort: { createdAt: -1 } },
+      populate: { path: "author", select: "username fullName avatar" },
+    })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Post.countDocuments({
+    reactions: {
+      $elemMatch: { user: req.params.userId }
+    }
+  });
+
+  // Attach userReaction if user is authenticated
+  const postsWithReaction = posts.map((post) => {
+    const obj = post.toObject({ virtuals: true });
+    if (req.user) {
+      const r = post.reactions.find((r) => r.user.toString() === req.user._id.toString());
+      obj.userReaction = r ? r.type : null;
+    }
+    return obj;
+  });
+
+  res.status(200).json({
+    success: true,
+    posts: postsWithReaction,
+    pagination: { page, limit, total, pages: Math.ceil(total / limit) },
   });
 });

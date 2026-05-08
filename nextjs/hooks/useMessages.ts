@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { messageService } from "@/services/messageService";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
 
 export const messageKeys = {
   all: ["messages"] as const,
@@ -12,7 +12,7 @@ export const messageKeys = {
 };
 
 export function useConversations() {
-  const user = useAuthStore((s) => s.user);
+  const { user } = useAuth();
   return useQuery({
     queryKey: messageKeys.conversations(),
     queryFn: () => messageService.getConversations(),
@@ -31,7 +31,7 @@ export function useMessages(conversationId: string) {
 }
 
 export function useUnreadMessageCount() {
-  const user = useAuthStore((s) => s.user);
+  const { user } = useAuth();
   return useQuery({
     queryKey: messageKeys.unread(),
     queryFn: () => messageService.getUnreadCount(),

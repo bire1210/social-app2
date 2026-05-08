@@ -11,6 +11,7 @@ const {
   editPost,
   toggleLike,
   reactToPost,
+  getUserLikedPosts,
 } = require("../controller/postController");
 const auth = require("../middleware/auth");
 const optionalAuth = require("../middleware/optionalAuth");
@@ -20,6 +21,7 @@ const upload = require("../middleware/upload");
 router.get("/feed", auth, getFeed);
 router.get("/explore", optionalAuth, getExplorePosts);
 router.get("/videos", optionalAuth, getVideoPosts);
+router.get("/user/:userId/liked", optionalAuth, getUserLikedPosts);
 router.get("/user/:userId", optionalAuth, getUserPosts);
 router.post("/", auth, upload.single("image"), createPost);
 

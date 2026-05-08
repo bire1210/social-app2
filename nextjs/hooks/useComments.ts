@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { commentService } from "@/services/commentService";
+import toast from "react-hot-toast";
 
 export const commentKeys = {
   all: ["comments"] as const,
@@ -23,6 +24,11 @@ export function useAddComment() {
       commentService.addComment(postId, content),
     onSuccess: (_data, { postId }) => {
       queryClient.invalidateQueries({ queryKey: commentKeys.post(postId) });
+      toast.success("Comment added!");
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || "Failed to add comment";
+      toast.error(message);
     },
   });
 }
@@ -34,6 +40,11 @@ export function useDeleteComment() {
       commentService.deleteComment(id),
     onSuccess: (_data, { postId }) => {
       queryClient.invalidateQueries({ queryKey: commentKeys.post(postId) });
+      toast.success("Comment deleted!");
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || "Failed to delete comment";
+      toast.error(message);
     },
   });
 }
