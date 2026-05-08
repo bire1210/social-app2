@@ -123,18 +123,21 @@ exports.searchUsers = asyncHandler(async (req, res) => {
     return res.status(200).json({ success: true, users: [] });
   }
 
+  const searchRegex = new RegExp(q.trim(), "i");
+  
   const users = await User.find({
     $and: [
       { _id: { $ne: req.user._id } },
       {
         $or: [
-          { username: { $regex: q, $options: "i" } },
-          { fullName: { $regex: q, $options: "i" } },
+          { username: searchRegex },
+          { fullName: searchRegex },
+          { email: searchRegex },
         ],
       },
     ],
   })
-    .select("username fullName avatar bio")
+    .select("username fullName avatar bio coverImage followers following")
     .limit(20);
 
   res.status(200).json({

@@ -12,7 +12,7 @@ const optionalAuth = require("../middleware/optionalAuth");
 const upload = require("../middleware/upload");
 
 // Static routes MUST come before /:id to avoid being swallowed
-router.get("/search", optionalAuth, searchUsers);
+router.get("/search", auth, searchUsers);
 router.get("/suggested", auth, getSuggestedUsers);
 
 // Profile update
