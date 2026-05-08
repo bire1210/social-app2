@@ -3,6 +3,7 @@
 import { useVideoFeed } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
 import { useReactToPost } from "@/hooks/usePosts";
+import { useComments, useAddComment, useDeleteComment } from "@/hooks/useComments";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { AuthPromptModal } from "@/components/shared/AuthPromptModal";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
@@ -14,6 +15,9 @@ import {
   Play,
   Volume2,
   VolumeX,
+  Trash2,
+  Send,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -30,8 +34,13 @@ export default function ReelsPage() {
     isFetchingNextPage,
   } = useVideoFeed();
   const reactToPost = useReactToPost();
+  const addComment = useAddComment();
+  const deleteComment = useDeleteComment();
 
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mutedVideos, setMutedVideos] = useState<Record<string, boolean>>({});
   const [playingVideos, setPlayingVideos] = useState<Record<string, boolean>>({});
@@ -125,6 +134,35 @@ export default function ReelsPage() {
     }
   };
 
+  const handleComment = (postId: string) => {
+    if (!user) {
+      setShowAuthPrompt(true);
+      return;
+    }
+    setSelectedPostId(postId);
+    setShowComments(!showComments);
+  };
+
+  const handleAddComment = async (e: React.FormEvent, postId: string) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    try {
+      await addComment.mutateAsync({ postId, content: commentText });
+      setCommentText("");
+    } catch {
+      toast.error("Failed to add comment");
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string, postId: string) => {
+    try {
+      await deleteComment.mutateAsync({ id: commentId, postId });
+    } catch {
+      toast.error("Failed to delete comment");
+    }
+  };
+
   const handleShare = (postId: string) => {
     const url = `${window.location.origin}/post/${postId}`;
     navigator.clipboard.writeText(url);
@@ -164,124 +202,206 @@ export default function ReelsPage() {
           <div
             key={post._id}
             data-index={index}
-            className="h-[calc(100vh-120px)] snap-start snap-always relative flex items-center justify-center bg-black rounded-xl overflow-hidden mb-2"
+            className="h-[calc(100vh-120px)] snap-start snap-always relative flex flex-col bg-black rounded-xl overflow-hidden mb-2"
           >
-            {/* Video */}
-            <video
-              ref={(el) => { videoRefs.current[post._id] = el; }}
-              src={getVideoUrl(post.video)}
-              loop
-              muted={mutedVideos[post._id] !== false}
-              playsInline
-              preload="metadata"
-              onClick={() => togglePlay(post._id)}
-              className="w-full h-full object-contain cursor-pointer"
-            />
-
-            {/* Play/Pause overlay */}
-            {!playingVideos[post._id] && (
-              <button
+            {/* Video Container */}
+            <div className="flex-1 relative flex items-center justify-center">
+              {/* Video */}
+              <video
+                ref={(el) => { videoRefs.current[post._id] = el; }}
+                src={getVideoUrl(post.video)}
+                loop
+                muted={mutedVideos[post._id] !== false}
+                playsInline
+                preload="metadata"
                 onClick={() => togglePlay(post._id)}
-                className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity"
-              >
-                <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Play className="h-8 w-8 text-white ml-1" fill="white" />
-                </div>
-              </button>
-            )}
+                className="w-full h-full object-contain cursor-pointer"
+              />
 
-            {/* Bottom gradient */}
-            <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-4 pt-16">
-              {/* Author info */}
-              <Link
-                href={`/profile/${post.author._id}`}
-                className="flex items-center gap-3 mb-3"
-              >
-                <UserAvatar
-                  src={post.author.avatar}
-                  fallback={post.author.fullName}
-                  className="h-10 w-10 ring-2 ring-white/30"
-                />
-                <div>
-                  <p className="text-white font-semibold text-sm">
-                    {post.author.fullName}
-                  </p>
-                  <p className="text-white/60 text-xs">
-                    {formatDistanceToNow(new Date(post.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </p>
-                </div>
-              </Link>
-
-              {/* Post content */}
-              {post.content && (
-                <p className="text-white/90 text-sm leading-relaxed line-clamp-2 mb-2">
-                  {post.content}
-                </p>
+              {/* Play/Pause overlay */}
+              {!playingVideos[post._id] && (
+                <button
+                  onClick={() => togglePlay(post._id)}
+                  className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity"
+                >
+                  <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <Play className="h-8 w-8 text-white ml-1" fill="white" />
+                  </div>
+                </button>
               )}
+
+              {/* Bottom gradient */}
+              <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-4 pt-16">
+                {/* Author info */}
+                <Link
+                  href={`/profile/${post.author._id}`}
+                  className="flex items-center gap-3 mb-3"
+                >
+                  <UserAvatar
+                    src={post.author.avatar}
+                    fallback={post.author.fullName}
+                    className="h-10 w-10 ring-2 ring-white/30"
+                  />
+                  <div>
+                    <p className="text-white font-semibold text-sm">
+                      {post.author.fullName}
+                    </p>
+                    <p className="text-white/60 text-xs">
+                      {formatDistanceToNow(new Date(post.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </p>
+                  </div>
+                </Link>
+
+                {/* Post content */}
+                {post.content && (
+                  <p className="text-white/90 text-sm leading-relaxed line-clamp-2 mb-2">
+                    {post.content}
+                  </p>
+                )}
+              </div>
+
+              {/* Right side action buttons */}
+              <div className="absolute right-3 bottom-28 flex flex-col items-center gap-5">
+                {/* Like */}
+                <button
+                  onClick={() => handleLike(post._id)}
+                  className="flex flex-col items-center gap-1 group"
+                >
+                  <div className={`h-11 w-11 rounded-full flex items-center justify-center transition-all ${
+                    post.userReaction
+                      ? "bg-red-500/20 text-red-500"
+                      : "bg-white/10 backdrop-blur-sm text-white hover:bg-white/20"
+                  }`}>
+                    <Heart
+                      className="h-6 w-6"
+                      fill={post.userReaction ? "currentColor" : "none"}
+                    />
+                  </div>
+                  <span className="text-white text-xs font-medium">
+                    {post.reactions?.length || 0}
+                  </span>
+                </button>
+
+                {/* Comment */}
+                <button
+                  onClick={() => handleComment(post._id)}
+                  className="flex flex-col items-center gap-1"
+                >
+                  <div className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-all">
+                    <MessageCircle className="h-6 w-6" />
+                  </div>
+                  <span className="text-white text-xs font-medium">
+                    {post.commentsCount || 0}
+                  </span>
+                </button>
+
+                {/* Share */}
+                <button
+                  onClick={() => handleShare(post._id)}
+                  className="flex flex-col items-center gap-1"
+                >
+                  <div className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-all">
+                    <Share2 className="h-6 w-6" />
+                  </div>
+                  <span className="text-white text-xs font-medium">Share</span>
+                </button>
+
+                {/* Mute toggle */}
+                <button
+                  onClick={() => toggleMute(post._id)}
+                  className="flex flex-col items-center gap-1"
+                >
+                  <div className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-all">
+                    {mutedVideos[post._id] !== false ? (
+                      <VolumeX className="h-5 w-5" />
+                    ) : (
+                      <Volume2 className="h-5 w-5" />
+                    )}
+                  </div>
+                </button>
+              </div>
             </div>
 
-            {/* Right side action buttons */}
-            <div className="absolute right-3 bottom-28 flex flex-col items-center gap-5">
-              {/* Like */}
-              <button
-                onClick={() => handleLike(post._id)}
-                className="flex flex-col items-center gap-1 group"
-              >
-                <div className={`h-11 w-11 rounded-full flex items-center justify-center transition-all ${
-                  post.userReaction
-                    ? "bg-red-500/20 text-red-500"
-                    : "bg-white/10 backdrop-blur-sm text-white hover:bg-white/20"
-                }`}>
-                  <Heart
-                    className="h-6 w-6"
-                    fill={post.userReaction ? "currentColor" : "none"}
-                  />
-                </div>
-                <span className="text-white text-xs font-medium">
-                  {post.reactions?.length || 0}
-                </span>
-              </button>
-
-              {/* Comment */}
-              <Link
-                href={`/post/${post._id}`}
-                className="flex flex-col items-center gap-1"
-              >
-                <div className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-all">
-                  <MessageCircle className="h-6 w-6" />
-                </div>
-                <span className="text-white text-xs font-medium">
-                  {post.commentsCount || 0}
-                </span>
-              </Link>
-
-              {/* Share */}
-              <button
-                onClick={() => handleShare(post._id)}
-                className="flex flex-col items-center gap-1"
-              >
-                <div className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-all">
-                  <Share2 className="h-6 w-6" />
-                </div>
-                <span className="text-white text-xs font-medium">Share</span>
-              </button>
-
-              {/* Mute toggle */}
-              <button
-                onClick={() => toggleMute(post._id)}
-                className="flex flex-col items-center gap-1"
-              >
-                <div className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-all">
-                  {mutedVideos[post._id] !== false ? (
-                    <VolumeX className="h-5 w-5" />
+            {/* Comments Section at Bottom */}
+            {showComments && selectedPostId === post._id && (
+              <div className="bg-black/95 border-t border-white/10 p-4 max-h-[40vh] overflow-y-auto">
+                {/* Comments List */}
+                <div className="space-y-3 mb-4">
+                  {post.comments && post.comments.length > 0 ? (
+                    post.comments.map((comment: any) => (
+                      <div key={comment._id} className="flex items-start gap-2 group">
+                        <Link href={`/profile/${comment.author._id}`}>
+                          <UserAvatar
+                            src={comment.author.avatar}
+                            fallback={comment.author.fullName}
+                            className="h-7 w-7 shrink-0"
+                          />
+                        </Link>
+                        <div className="flex-1 min-w-0">
+                          <div className="bg-white/10 rounded-lg px-2 py-1 inline-block max-w-full">
+                            <Link
+                              href={`/profile/${comment.author._id}`}
+                              className="text-xs font-semibold text-white hover:underline"
+                            >
+                              {comment.author.fullName}
+                            </Link>
+                            <p className="text-xs text-white/90 mt-0.5 break-words">{comment.content}</p>
+                          </div>
+                          <p className="text-[10px] text-white/50 mt-1 ml-1">
+                            {formatDistanceToNow(new Date(comment.createdAt), {
+                              addSuffix: true,
+                            })}
+                          </p>
+                        </div>
+                        {user && user._id === comment.author._id && (
+                          <button
+                            onClick={() => handleDeleteComment(comment._id, post._id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-white/50 hover:text-red-500"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                    ))
                   ) : (
-                    <Volume2 className="h-5 w-5" />
+                    <p className="text-xs text-white/50 text-center py-2">No comments yet</p>
                   )}
                 </div>
-              </button>
-            </div>
+
+                {/* Comment Input */}
+                {user && (
+                  <form onSubmit={(e) => handleAddComment(e, post._id)} className="flex items-center gap-2 pt-3 border-t border-white/10">
+                    <UserAvatar
+                      src={user.avatar}
+                      fallback={user.fullName}
+                      className="h-7 w-7 shrink-0"
+                    />
+                    <div className="flex-1 relative">
+                      <input
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        placeholder="Add a comment..."
+                        className="w-full h-8 rounded-full bg-white/10 px-3 pr-8 text-xs text-white placeholder-white/50 outline-none focus:ring-1 focus:ring-red-500/50"
+                        maxLength={300}
+                      />
+                      <button
+                        type="submit"
+                        disabled={!commentText.trim() || addComment.isPending}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 disabled:text-white/30"
+                      >
+                        {addComment.isPending ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Send className="h-3 w-3" />
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
           </div>
         ))}
 
