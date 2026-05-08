@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthInitializer } from "@/components/shared/AuthInitializer";
+import { NetworkErrorHandler } from "@/components/shared/NetworkErrorHandler";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { Toaster } from "react-hot-toast";
@@ -27,6 +28,7 @@ export default function RootLayout({
         <ThemeProvider>
           <QueryProvider>
             <AuthInitializer>
+              <NetworkErrorHandler />
               {children}
               <Toaster
                 position="bottom-right"

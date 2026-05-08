@@ -165,14 +165,14 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex items-center gap-5 mt-3">
-              <span className="text-sm">
+              <Link href="/following" className="text-sm hover:underline">
                 <strong>{profile.followingCount}</strong>{" "}
                 <span className="text-muted-foreground">Following</span>
-              </span>
-              <span className="text-sm">
+              </Link>
+              <Link href="/followers" className="text-sm hover:underline">
                 <strong>{profile.followersCount}</strong>{" "}
                 <span className="text-muted-foreground">Followers</span>
-              </span>
+              </Link>
             </div>
           </div>
         </div>
