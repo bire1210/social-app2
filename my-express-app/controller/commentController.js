@@ -14,11 +14,30 @@ exports.addComment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Post not found");
   }
 
-  const comment = await Comment.create({
+  const commentData = {
     author: req.user._id,
     post: req.params.postId,
-    content: req.body.content,
-  });
+    content: req.body.content || "",
+  };
+
+  // Handle file upload
+  if (req.file) {
+    const isVideo = req.file.mimetype.startsWith("video/");
+    if (isVideo) {
+      commentData.video = `/uploads/${req.file.filename}`;
+      commentData.mediaType = "video";
+    } else {
+      commentData.image = `/uploads/${req.file.filename}`;
+      commentData.mediaType = "image";
+    }
+  }
+
+  // Validate that either content or media is provided
+  if (!commentData.content && commentData.mediaType === "none") {
+    throw new ApiError(400, "Comment must have either text or media");
+  }
+
+  const comment = await Comment.create(commentData);
 
   // Add comment reference to the post
   await Post.findByIdAndUpdate(req.params.postId, {

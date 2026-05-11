@@ -2,13 +2,13 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useStories, useCreateStory, useViewStory, useDeleteStory } from "@/hooks/useStories";
+import { useStories, useCreateStory, useViewStory, useDeleteStory, useAddStoryComment, useDeleteStoryComment } from "@/hooks/useStories";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { Story, StoryGroup } from "@/types";
 import { UPLOADS_URL } from "@/lib/constants";
 import {
   Plus, ChevronLeft, ChevronRight, X, Trash2,
-  ImagePlus, Type, Loader2, ChevronLeftIcon, ChevronRightIcon,
+  ImagePlus, Type, Loader2, ChevronLeftIcon, ChevronRightIcon, Send, MessageCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -41,9 +41,13 @@ function StoryViewer({
   const { user } = useAuth();
   const viewStory = useViewStory();
   const deleteStory = useDeleteStory();
+  const addComment = useAddStoryComment();
+  const deleteComment = useDeleteStoryComment();
   const [groupIdx, setGroupIdx] = useState(startGroupIndex);
   const [storyIdx, setStoryIdx] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [commentText, setCommentText] = useState("");
+  const [showComments, setShowComments] = useState(false);
 
   const group = groups[groupIdx];
   const story = group?.stories[storyIdx];
@@ -89,6 +93,28 @@ function StoryViewer({
     }
   };
 
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    try {
+      await addComment.mutateAsync({ storyId: story._id, content: commentText });
+      setCommentText("");
+      toast.success("Comment added");
+    } catch {
+      toast.error("Failed to add comment");
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment.mutateAsync({ storyId: story._id, commentId });
+      toast.success("Comment deleted");
+    } catch {
+      toast.error("Failed to delete comment");
+    }
+  };
+
   // Auto-play timer: 5 seconds per story
   useEffect(() => {
     const interval = setInterval(() => {
@@ -120,7 +146,7 @@ function StoryViewer({
   return (
     <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={onClose}>
       <div
-        className="relative w-full max-w-sm h-[85vh] rounded-2xl overflow-hidden shadow-2xl"
+        className="relative w-full max-w-sm h-[85vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
         style={{ backgroundColor: story.backgroundColor || "#1877f2" }}
       >
@@ -163,22 +189,105 @@ function StoryViewer({
         </div>
 
         {/* Story content */}
-        {story.image ? (
-          <img src={getUrl(story.image)} alt="story" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center p-8">
-            <p className="text-white text-2xl font-bold text-center leading-relaxed">{story.text}</p>
+        <div className="flex-1 flex items-center justify-center relative">
+          {story.image ? (
+            <img src={getUrl(story.image)} alt="story" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center p-8">
+              <p className="text-white text-2xl font-bold text-center leading-relaxed">{story.text}</p>
+            </div>
+          )}
+
+          {/* Text overlay on image */}
+          {story.image && story.text && (
+            <div className="absolute bottom-16 left-4 right-4">
+              <p className="text-white text-lg font-semibold text-center drop-shadow-lg bg-black/30 rounded-xl px-3 py-2">
+                {story.text}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Comments section */}
+        {showComments && (
+          <div className="absolute inset-0 bg-black/95 rounded-2xl flex flex-col z-20">
+            {/* Comments header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/20">
+              <h3 className="text-white font-semibold flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                Comments ({story.comments?.length || 0})
+              </h3>
+              <button onClick={() => setShowComments(false)} className="text-white/80 hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Comments list */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {!story.comments || story.comments.length === 0 ? (
+                <p className="text-center text-white/60 text-sm py-8">No comments yet</p>
+              ) : (
+                story.comments.map((comment: any) => (
+                  <div key={comment._id} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <UserAvatar
+                          src={comment.author?.avatar}
+                          fallback={comment.author?.fullName}
+                          className="h-6 w-6"
+                        />
+                        <span className="text-xs font-semibold text-white">{comment.author?.fullName}</span>
+                      </div>
+                      {user?._id === comment.author?._id && (
+                        <button
+                          onClick={() => handleDeleteComment(comment._id)}
+                          className="text-white/60 hover:text-white/80 p-1"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-sm text-white/80 ml-8">{comment.content}</p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Comment input */}
+            {user && (
+              <form onSubmit={handleAddComment} className="p-4 border-t border-white/20">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Say something..."
+                    className="flex-1 h-9 rounded-full bg-white/20 px-3 text-sm text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-white/30"
+                    maxLength={300}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!commentText.trim() || addComment.isPending}
+                    className="p-2 text-white disabled:text-white/40 hover:bg-white/10 rounded-full transition-colors"
+                  >
+                    <Send className="h-4 w-4" />
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
 
-        {/* Text overlay on image */}
-        {story.image && story.text && (
-          <div className="absolute bottom-16 left-4 right-4">
-            <p className="text-white text-lg font-semibold text-center drop-shadow-lg bg-black/30 rounded-xl px-3 py-2">
-              {story.text}
-            </p>
-          </div>
-        )}
+        {/* Bottom action bar */}
+        <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2 z-10">
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="flex-1 flex items-center justify-center gap-2 bg-white/20 hover:bg-white/30 text-white rounded-full py-2 transition-colors"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="text-xs font-semibold">{story.comments?.length || 0}</span>
+          </button>
+        </div>
 
         {/* Nav areas */}
         <button onClick={goPrev} className="absolute left-0 top-0 w-1/3 h-full z-10" />

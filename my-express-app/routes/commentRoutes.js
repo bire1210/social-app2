@@ -7,12 +7,13 @@ const {
 } = require("../controller/commentController");
 const auth = require("../middleware/auth");
 const optionalAuth = require("../middleware/optionalAuth");
+const upload = require("../middleware/upload");
 
 // Public routes (guests can read comments)
 router.get("/:postId", optionalAuth, getComments);
 
 // Private routes (require authentication)
-router.post("/:postId", auth, addComment);
+router.post("/:postId", auth, upload.single("image"), addComment);
 router.delete("/:id", auth, deleteComment);
 
 module.exports = router;

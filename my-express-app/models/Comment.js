@@ -14,9 +14,22 @@ const commentSchema = new mongoose.Schema(
     },
     content: {
       type: String,
-      required: [true, "Comment content is required"],
       maxlength: [300, "Comment cannot exceed 300 characters"],
       trim: true,
+      default: "",
+    },
+    image: {
+      type: String,
+      default: "",
+    },
+    video: {
+      type: String,
+      default: "",
+    },
+    mediaType: {
+      type: String,
+      enum: ["none", "image", "video"],
+      default: "none",
     },
     reactions: [
       {

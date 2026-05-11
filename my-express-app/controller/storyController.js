@@ -89,3 +89,80 @@ exports.deleteStory = asyncHandler(async (req, res) => {
   await Story.findByIdAndDelete(req.params.id);
   res.status(200).json({ success: true });
 });
+
+// @desc    Add a comment to a story
+// @route   POST /api/stories/:id/comments
+// @access  Private
+exports.addStoryComment = asyncHandler(async (req, res) => {
+  const story = await Story.findById(req.params.id);
+  if (!story) throw new ApiError(404, "Story not found");
+
+  const { content } = req.body;
+  if (!content || !content.trim()) {
+    throw new ApiError(400, "Comment content is required");
+  }
+
+  const comment = {
+    author: req.user._id,
+    content: content.trim(),
+    createdAt: new Date(),
+  };
+
+  story.comments.push(comment);
+  await story.save();
+
+  // Populate the comment author
+  const populatedStory = await Story.findById(story._id).populate(
+    "comments.author",
+    "username fullName avatar"
+  );
+
+  const addedComment = populatedStory.comments[populatedStory.comments.length - 1];
+
+  res.status(201).json({
+    success: true,
+    comment: addedComment,
+  });
+});
+
+// @desc    Get comments for a story
+// @route   GET /api/stories/:id/comments
+// @access  Private
+exports.getStoryComments = asyncHandler(async (req, res) => {
+  const story = await Story.findById(req.params.id).populate(
+    "comments.author",
+    "username fullName avatar"
+  );
+
+  if (!story) throw new ApiError(404, "Story not found");
+
+  res.status(200).json({
+    success: true,
+    comments: story.comments,
+  });
+});
+
+// @desc    Delete a story comment
+// @route   DELETE /api/stories/:storyId/comments/:commentId
+// @access  Private
+exports.deleteStoryComment = asyncHandler(async (req, res) => {
+  const { storyId, commentId } = req.params;
+
+  const story = await Story.findById(storyId);
+  if (!story) throw new ApiError(404, "Story not found");
+
+  const comment = story.comments.id(commentId);
+  if (!comment) throw new ApiError(404, "Comment not found");
+
+  if (comment.author.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Not authorized to delete this comment");
+  }
+
+  story.comments.id(commentId).deleteOne();
+  await story.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Comment deleted successfully",
+  });
+});

@@ -13,13 +13,22 @@ export const commentService = {
 
   addComment: async (
     postId: string,
-    content: string
+    content: string,
+    file?: File
   ): Promise<{ success: boolean; comment: Comment }> => {
     if (!postId) throw new Error("Post ID is required");
-    if (!content?.trim()) throw new Error("Comment content is required");
-    if (content.length > 300) throw new Error("Comment cannot exceed 300 characters");
+    if (!content?.trim() && !file) throw new Error("Comment must have either text or media");
+    if (content && content.length > 300) throw new Error("Comment cannot exceed 300 characters");
     
-    const res = await api.post(`/comments/${postId}`, { content: content.trim() });
+    const formData = new FormData();
+    formData.append("content", content?.trim() || "");
+    if (file) {
+      formData.append("image", file);
+    }
+
+    const res = await api.post(`/comments/${postId}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return res.data;
   },
 

@@ -7,6 +7,13 @@ const storySchema = new mongoose.Schema(
     text: { type: String, default: "", maxlength: 200 },
     backgroundColor: { type: String, default: "#1877f2" },
     viewers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    comments: [
+      {
+        author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        content: { type: String, maxlength: 300, trim: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
     expiresAt: { type: Date, default: () => new Date(Date.now() + 24 * 60 * 60 * 1000) },
   },
   { timestamps: true }

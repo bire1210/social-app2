@@ -40,6 +40,7 @@ export default function ReelsPage() {
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [commentFile, setCommentFile] = useState<File | null>(null);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mutedVideos, setMutedVideos] = useState<Record<string, boolean>>({});
@@ -145,11 +146,12 @@ export default function ReelsPage() {
 
   const handleAddComment = async (e: React.FormEvent, postId: string) => {
     e.preventDefault();
-    if (!commentText.trim()) return;
+    if (!commentText.trim() && !commentFile) return;
 
     try {
-      await addComment.mutateAsync({ postId, content: commentText });
+      await addComment.mutateAsync({ postId, content: commentText, file: commentFile || undefined });
       setCommentText("");
+      setCommentFile(null);
     } catch {
       toast.error("Failed to add comment");
     }
@@ -358,8 +360,25 @@ export default function ReelsPage() {
                             >
                               {comment.author.fullName}
                             </Link>
-                            <p className="text-xs text-white/90 mt-0.5 break-words">{comment.content}</p>
+                            {comment.content && (
+                              <p className="text-xs text-white/90 mt-0.5 break-words">{comment.content}</p>
+                            )}
                           </div>
+                          {/* Media */}
+                          {comment.image && !comment.video && (
+                            <img
+                              src={getVideoUrl(comment.image)}
+                              alt="Comment image"
+                              className="mt-2 rounded-lg max-w-[200px] max-h-[200px] object-cover"
+                            />
+                          )}
+                          {comment.video && (
+                            <video
+                              src={getVideoUrl(comment.video)}
+                              controls
+                              className="mt-2 rounded-lg max-w-[200px] max-h-[200px] object-cover"
+                            />
+                          )}
                           <p className="text-[10px] text-white/50 mt-1 ml-1">
                             {formatDistanceToNow(new Date(comment.createdAt), {
                               addSuffix: true,
@@ -394,12 +413,24 @@ export default function ReelsPage() {
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
                         placeholder="Add a comment..."
-                        className="w-full h-8 rounded-full bg-white/10 px-3 pr-8 text-xs text-white placeholder-white/50 outline-none focus:ring-1 focus:ring-red-500/50"
+                        className="w-full h-8 rounded-full bg-white/10 px-3 pr-20 text-xs text-white placeholder-white/50 outline-none focus:ring-1 focus:ring-red-500/50"
                         maxLength={300}
                       />
+                      {/* File input */}
+                      <label className="absolute right-10 top-1/2 -translate-y-1/2 text-white/50 hover:text-white cursor-pointer transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        <input
+                          type="file"
+                          accept="image/*,video/*"
+                          onChange={(e) => setCommentFile(e.target.files?.[0] || null)}
+                          className="hidden"
+                        />
+                      </label>
                       <button
                         type="submit"
-                        disabled={!commentText.trim() || addComment.isPending}
+                        disabled={(!commentText.trim() && !commentFile) || addComment.isPending}
                         className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 disabled:text-white/30"
                       >
                         {addComment.isPending ? (

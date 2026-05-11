@@ -42,3 +42,28 @@ export function useDeleteStory() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: storyKeys.all }),
   });
 }
+
+export function useAddStoryComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ storyId, content }: { storyId: string; content: string }) =>
+      storyService.addComment(storyId, content),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: storyKeys.all }),
+  });
+}
+
+export function useGetStoryComments(storyId: string) {
+  return useQuery({
+    queryKey: [...storyKeys.all, "comments", storyId],
+    queryFn: () => storyService.getComments(storyId),
+  });
+}
+
+export function useDeleteStoryComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ storyId, commentId }: { storyId: string; commentId: string }) =>
+      storyService.deleteComment(storyId, commentId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: storyKeys.all }),
+  });
+}

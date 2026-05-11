@@ -20,8 +20,8 @@ export function useComments(postId: string) {
 export function useAddComment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postId, content }: { postId: string; content: string }) =>
-      commentService.addComment(postId, content),
+    mutationFn: ({ postId, content, file }: { postId: string; content: string; file?: File }) =>
+      commentService.addComment(postId, content, file),
     onSuccess: (_data, { postId }) => {
       queryClient.invalidateQueries({ queryKey: commentKeys.post(postId) });
       toast.success("Comment added!");
