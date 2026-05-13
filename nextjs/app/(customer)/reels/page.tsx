@@ -48,6 +48,12 @@ export default function ReelsPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 
+  // Fetch comments for the selected post
+  const { data: commentsData, isLoading: commentsLoading } = useComments(
+    showComments && selectedPostId ? selectedPostId : ""
+  );
+  const comments = commentsData?.comments ?? [];
+
   const posts = (data?.pages.flatMap((page) => page.posts) ?? []).filter(
     (p) => p.author != null
   );
@@ -342,8 +348,12 @@ export default function ReelsPage() {
 
                 {/* Comments List */}
                 <div className="space-y-3 mb-4 pr-6">
-                  {post.comments && post.comments.length > 0 ? (
-                    post.comments.map((comment: any) => (
+                  {commentsLoading ? (
+                    <div className="flex justify-center py-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-white/50" />
+                    </div>
+                  ) : comments.length > 0 ? (
+                    comments.map((comment: any) => (
                       <div key={comment._id} className="flex items-start gap-2 group">
                         <Link href={`/profile/${comment.author._id}`}>
                           <UserAvatar

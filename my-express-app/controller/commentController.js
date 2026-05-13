@@ -8,16 +8,20 @@ const { createNotification } = require("../services/notificationService");
 // @route   POST /api/comments/:postId
 // @access  Private
 exports.addComment = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.postId);
+  const { postId } = req.params;
+  const { content } = req.body;
 
+  // Validate post exists
+  const post = await Post.findById(postId);
   if (!post) {
     throw new ApiError(404, "Post not found");
   }
 
+  // Prepare comment data
   const commentData = {
     author: req.user._id,
-    post: req.params.postId,
-    content: req.body.content || "",
+    post: postId,
+    content: (content || "").trim(),
   };
 
   // Handle file upload
@@ -37,10 +41,11 @@ exports.addComment = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Comment must have either text or media");
   }
 
+  // Create comment
   const comment = await Comment.create(commentData);
 
   // Add comment reference to the post
-  await Post.findByIdAndUpdate(req.params.postId, {
+  await Post.findByIdAndUpdate(postId, {
     $push: { comments: comment._id },
   });
 
@@ -52,6 +57,7 @@ exports.addComment = asyncHandler(async (req, res) => {
     post: post._id,
   });
 
+  // Populate and return comment
   const populatedComment = await Comment.findById(comment._id).populate(
     "author",
     "username fullName avatar"
