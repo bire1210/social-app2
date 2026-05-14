@@ -20,10 +20,12 @@ const handleFileUpload = (req, res, next) => {
   });
 };
 
-// Public routes (guests can read comments)
+// Routes with proper chaining
 router
-  .get("/:postId", optionalAuth, getComments)
-  .post("/:postId", auth, handleFileUpload, addComment)
-  .delete("/:id", auth, deleteComment);
+  .route("/:postId")
+  .get(optionalAuth, getComments)
+  .post(auth, handleFileUpload, addComment);
+
+router.delete("/:id", auth, deleteComment);
 
 module.exports = router;

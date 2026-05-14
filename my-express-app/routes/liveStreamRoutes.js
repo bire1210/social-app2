@@ -13,13 +13,13 @@ const {
   getStreamerLiveStreams,
 } = require("../controller/liveStreamController");
 
-// Public routes
+// Public routes - specific routes BEFORE parameterized routes
 router
   .get("/", getLiveStreams)
-  .get("/:id", optionalAuth, getLiveStream)
-  .get("/streamer/:streamerId", getStreamerLiveStreams);
+  .get("/streamer/:streamerId", getStreamerLiveStreams)
+  .get("/:id", optionalAuth, getLiveStream);
 
-// Private routes
+// Private routes - specific routes BEFORE parameterized routes
 router
   .use(auth)
   .post("/start", startLiveStream)

@@ -12,14 +12,21 @@ const optionalAuth = require("../middleware/optionalAuth");
 const upload = require("../middleware/upload");
 
 // Static routes MUST come before /:id to avoid being swallowed
-router.get("/search", auth, searchUsers);
-router.get("/suggested", auth, getSuggestedUsers);
-
-// Profile update
-router.put("/profile", auth, upload.fields([{ name: "avatar", maxCount: 1 }, { name: "coverImage", maxCount: 1 }]), updateProfile);
-
-// Dynamic :id routes LAST
-router.get("/:id", optionalAuth, getUserProfile);
-router.post("/:id/follow", auth, toggleFollow);
+router
+  .get("/search", auth, searchUsers)
+  .get("/suggested", auth, getSuggestedUsers)
+  // Profile update
+  .put(
+    "/profile",
+    auth,
+    upload.fields([
+      { name: "avatar", maxCount: 1 },
+      { name: "coverImage", maxCount: 1 },
+    ]),
+    updateProfile,
+  )
+  // Dynamic :id routes LAST
+  .get("/:id", optionalAuth, getUserProfile)
+  .post("/:id/follow", auth, toggleFollow);
 
 module.exports = router;

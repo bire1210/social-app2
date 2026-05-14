@@ -9,10 +9,9 @@ const {
   getUnreadCount,
 } = require("../controller/messageController");
 
-router.use(auth); // all message routes require auth
-
-// Define specific routes BEFORE parameterized routes
 router
+  .use(auth) // all message routes require auth
+  // Define specific routes BEFORE parameterized routes
   .get("/unread-count", getUnreadCount)
   .get("/conversations", getConversations)
   .get("/conversations/:id/messages", getMessages)

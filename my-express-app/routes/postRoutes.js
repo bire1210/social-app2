@@ -24,10 +24,8 @@ router
   .get("/videos", optionalAuth, getVideoPosts)
   .get("/user/:userId/liked", optionalAuth, getUserLikedPosts)
   .get("/user/:userId", optionalAuth, getUserPosts)
-  .post("/", auth, upload.single("image"), createPost);
-
-// Dynamic :id routes LAST
-router
+  .post("/", auth, upload.single("image"), createPost)
+  // Dynamic :id routes LAST
   .get("/:id", optionalAuth, getPost)
   .put("/:id", auth, editPost)
   .delete("/:id", auth, deletePost)
