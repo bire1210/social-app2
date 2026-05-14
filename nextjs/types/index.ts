@@ -6,8 +6,8 @@ export interface User {
   bio: string;
   avatar: string;
   coverImage: string;
-  followers: string[];
-  following: string[];
+  followers: User[];
+  following: User[];
   followersCount: number;
   followingCount: number;
   role: "user" | "admin";
