@@ -8,9 +8,10 @@ const {
 } = require("../controller/authController");
 const auth = require("../middleware/auth");
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/logout", auth, logout);
-router.get("/me", auth, getMe);
+router
+  .post("/register", register)
+  .post("/login", login)
+  .post("/logout", auth, logout)
+  .get("/me", auth, getMe);
 
 module.exports = router;

@@ -9,8 +9,9 @@ const auth = require("../middleware/auth");
 
 router.use(auth);
 
-router.get("/", getNotifications);
-router.put("/read", markAllAsRead);
-router.delete("/:id", deleteNotification);
+router
+  .get("/", getNotifications)
+  .put("/read", markAllAsRead)
+  .delete("/:id", deleteNotification);
 
 module.exports = router;

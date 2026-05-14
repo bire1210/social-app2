@@ -21,10 +21,9 @@ const handleFileUpload = (req, res, next) => {
 };
 
 // Public routes (guests can read comments)
-router.get("/:postId", optionalAuth, getComments);
-
-// Private routes (require authentication)
-router.post("/:postId", auth, handleFileUpload, addComment);
-router.delete("/:id", auth, deleteComment);
+router
+  .get("/:postId", optionalAuth, getComments)
+  .post("/:postId", auth, handleFileUpload, addComment)
+  .delete("/:id", auth, deleteComment);
 
 module.exports = router;

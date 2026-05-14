@@ -95,9 +95,6 @@ exports.getMessages = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Send a message
-// @route   POST /api/messages/conversations/:id/messages
-// @access  Private
 exports.sendMessage = asyncHandler(async (req, res) => {
   const { content } = req.body;
   if (!content?.trim()) throw new ApiError(400, "Message content is required");
@@ -130,9 +127,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, message: populated });
 });
 
-// @desc    Get total unread message count
-// @route   GET /api/messages/unread-count
-// @access  Private
+
 exports.getUnreadCount = asyncHandler(async (req, res) => {
   const conversations = await Conversation.find({ participants: req.user._id });
   const convIds = conversations.map((c) => c._id);

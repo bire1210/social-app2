@@ -26,10 +26,11 @@ router.post("/make-me-admin", async (req, res) => {
 
 router.use(adminAuth);
 
-router.get("/stats", getDashboardStats);
-router.get("/users", getAllUsers);
-router.delete("/users/:id", deleteUser);
-router.put("/users/:id/role", toggleUserRole);
-router.delete("/posts/:id", deleteAnyPost);
+router
+  .get("/stats", getDashboardStats)
+  .get("/users", getAllUsers)
+  .delete("/users/:id", deleteUser)
+  .put("/users/:id/role", toggleUserRole)
+  .delete("/posts/:id", deleteAnyPost);
 
 module.exports = router;

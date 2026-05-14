@@ -12,15 +12,18 @@ const {
   deleteStoryComment,
 } = require("../controller/storyController");
 
-router.use(auth);
-router.get("/", getStories);
-router.post("/", upload.single("image"), createStory);
-router.post("/:id/view", viewStory);
-router.delete("/:id", deleteStory);
+router
+  .use(auth)
+  .get("/", getStories)
+  .post("/", upload.single("image"), createStory)
+  .post("/:id/view", viewStory)
+  .delete("/:id", deleteStory);
 
 // Story comments routes
-router.post("/:id/comments", addStoryComment);
-router.get("/:id/comments", getStoryComments);
-router.delete("/:storyId/comments/:commentId", deleteStoryComment);
+router
+
+  .post("/:id/comments", addStoryComment)
+  .get("/:id/comments", getStoryComments)
+  .delete("/:storyId/comments/:commentId", deleteStoryComment);
 
 module.exports = router;

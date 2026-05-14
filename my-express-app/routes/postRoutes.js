@@ -18,18 +18,20 @@ const optionalAuth = require("../middleware/optionalAuth");
 const upload = require("../middleware/upload");
 
 // Static routes MUST come before /:id
-router.get("/feed", auth, getFeed);
-router.get("/explore", optionalAuth, getExplorePosts);
-router.get("/videos", optionalAuth, getVideoPosts);
-router.get("/user/:userId/liked", optionalAuth, getUserLikedPosts);
-router.get("/user/:userId", optionalAuth, getUserPosts);
-router.post("/", auth, upload.single("image"), createPost);
+router
+  .get("/feed", auth, getFeed)
+  .get("/explore", optionalAuth, getExplorePosts)
+  .get("/videos", optionalAuth, getVideoPosts)
+  .get("/user/:userId/liked", optionalAuth, getUserLikedPosts)
+  .get("/user/:userId", optionalAuth, getUserPosts)
+  .post("/", auth, upload.single("image"), createPost);
 
 // Dynamic :id routes LAST
-router.get("/:id", optionalAuth, getPost);
-router.put("/:id", auth, editPost);
-router.delete("/:id", auth, deletePost);
-router.post("/:id/like", auth, toggleLike);
-router.post("/:id/react", auth, reactToPost);
+router
+  .get("/:id", optionalAuth, getPost)
+  .put("/:id", auth, editPost)
+  .delete("/:id", auth, deletePost)
+  .post("/:id/like", auth, toggleLike)
+  .post("/:id/react", auth, reactToPost);
 
 module.exports = router;

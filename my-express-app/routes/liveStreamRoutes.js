@@ -14,16 +14,18 @@ const {
 } = require("../controller/liveStreamController");
 
 // Public routes
-router.get("/", getLiveStreams);
-router.get("/:id", optionalAuth, getLiveStream);
-router.get("/streamer/:streamerId", getStreamerLiveStreams);
+router
+  .get("/", getLiveStreams)
+  .get("/:id", optionalAuth, getLiveStream)
+  .get("/streamer/:streamerId", getStreamerLiveStreams);
 
 // Private routes
-router.use(auth);
-router.post("/start", startLiveStream);
-router.post("/:id/view", addViewer);
-router.post("/:id/like", likeLiveStream);
-router.post("/:id/comment", addComment);
-router.post("/:id/end", endLiveStream);
+router
+  .use(auth)
+  .post("/start", startLiveStream)
+  .post("/:id/view", addViewer)
+  .post("/:id/like", likeLiveStream)
+  .post("/:id/comment", addComment)
+  .post("/:id/end", endLiveStream);
 
 module.exports = router;
