@@ -14,7 +14,7 @@ import { useSearchParams } from "next/navigation";
 export default function ExplorePage() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const { data: postsData, isLoading } = useExplorePosts();
+  const { data: postsData, isLoading, error: postsError } = useExplorePosts();
   const { data: usersData, isFetching: searching, error: searchError } = useSearchUsers(searchQuery);
 
   // Sync with URL query param changes
@@ -28,6 +28,31 @@ export default function ExplorePage() {
 
   if (isLoading) {
     return <LoadingSpinner className="mt-20" />;
+  }
+
+  // Handle API connection errors
+  if (postsError) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Explore</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Discover new people and posts
+          </p>
+        </div>
+        <div className="text-center py-16 bg-card rounded-xl border border-border">
+          <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 text-sm">
+            <p className="font-medium mb-2">Unable to connect to server</p>
+            <p className="text-xs">
+              {postsError instanceof Error ? postsError.message : "Network error occurred"}
+            </p>
+            <p className="text-xs mt-2 text-muted-foreground">
+              If you're on mobile, make sure the API URL in .env.local uses your computer's IP address instead of localhost
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
