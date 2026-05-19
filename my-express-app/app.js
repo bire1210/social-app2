@@ -18,18 +18,37 @@ const liveStreamRoutes = require("./routes/liveStreamRoutes");
 const app = express();
 
 // --------------- Middleware ---------------
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
-    // Allow any localhost port in development
-    if (origin.match(/^http:\/\/localhost:\d+$/)) return callback(null, true);
-    // Allow configured CLIENT_URL in production
-    if (origin === process.env.CLIENT_URL) return callback(null, true);
-    callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+
+      // Allow any localhost port in development
+      if (origin.match(/^http:\/\/localhost:\d+$/)) return callback(null, true);
+
+      // Allow local IP addresses for mobile testing (192.168.x.x, 10.x.x.x, etc.)
+      if (
+        origin.match(
+          /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+):\d+$/,
+        )
+      ) {
+        return callback(null, true);
+      }
+
+      // Allow configured CLIENT_URL in production
+      if (origin === process.env.CLIENT_URL) return callback(null, true);
+
+      // In development, be more permissive
+      if (process.env.NODE_ENV !== "production") {
+        return callback(null, true);
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

@@ -60,7 +60,7 @@ exports.addComment = asyncHandler(async (req, res) => {
   // Populate and return comment
   const populatedComment = await Comment.findById(comment._id).populate(
     "author",
-    "username fullName avatar"
+    "username fullName avatar",
   );
 
   res.status(201).json({
