@@ -12,7 +12,6 @@ import {
   Image as ImageIcon,
   ExternalLink
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface FileInfo {
   url: string;
@@ -122,14 +121,13 @@ export const FileDisplay = memo(function FileDisplay({
                 <p className="text-xs text-muted-foreground">{fileSize}</p>
               </div>
               {showDownload && (
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
                   onClick={handleDownload}
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0 rounded-full hover:bg-accent transition-colors flex items-center justify-center"
+                  title="Download"
                 >
                   <Download className="h-4 w-4" />
-                </Button>
+                </button>
               )}
             </div>
             <audio 
@@ -157,25 +155,21 @@ export const FileDisplay = memo(function FileDisplay({
                 <p className="text-xs text-muted-foreground">{fileSize}</p>
               </div>
               <div className="flex gap-1 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
                   onClick={handleOpen}
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full hover:bg-accent transition-colors flex items-center justify-center"
                   title="Open in new tab"
                 >
                   <ExternalLink className="h-4 w-4" />
-                </Button>
+                </button>
                 {showDownload && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
+                  <button
                     onClick={handleDownload}
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full hover:bg-accent transition-colors flex items-center justify-center"
                     title="Download"
                   >
                     <Download className="h-4 w-4" />
-                  </Button>
+                  </button>
                 )}
               </div>
             </div>

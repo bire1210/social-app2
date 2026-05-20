@@ -178,7 +178,7 @@ export function TopNavbar() {
                     onClick={() => setShowProfileMenu(false)}
                     className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors"
                   >
-                    <UserAvatar src={user.avatar} fallback={user.fullName} className="h-14 w-14" />
+                    <UserAvatar src=  {user.avatar} fallback={user.fullName} className="h-14 w-14" />
                     <div>
                       <p className="font-semibold">{user.fullName}</p>
                       <p className="text-xs text-red-500 mt-0.5">See your profile</p>

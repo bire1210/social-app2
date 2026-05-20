@@ -38,6 +38,8 @@ export default function NotificationsPage() {
   };
 
   const getNotificationText = (n: Notification) => {
+    if (!n || !n.type) return "sent you a notification";
+    
     switch (n.type) {
       case "like":
         return "liked your post";
@@ -45,8 +47,10 @@ export default function NotificationsPage() {
         return "commented on your post";
       case "follow":
         return "started following you";
+      case "reaction":
+        return "reacted to your post";
       default:
-        return "";
+        return "sent you a notification";
     }
   };
 
@@ -97,9 +101,13 @@ export default function NotificationsPage() {
           notifications.map((n) => {
             const config = notificationIcons[n.type];
             const Icon = config.icon;
-            const href = n.type === "follow"
-              ? `/profile/${n.sender._id}`
-              : n.post ? `/post/${n.post}` : `/profile/${n.sender._id}`;
+            
+            // Safe href generation with fallbacks
+            let href = `/profile/${n.sender._id}`;
+            if (n.type !== "follow" && n.post?._id) {
+              href = `/post/${n.post._id}`;
+            }
+            
             return (
               <Link
                 key={n._id}
@@ -114,7 +122,7 @@ export default function NotificationsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">
                     <span className="font-semibold">
-                      {n.sender.fullName}
+                      {n.sender?.fullName || "Someone"}
                     </span>{" "}
                     {getNotificationText(n)}
                   </p>
@@ -125,8 +133,8 @@ export default function NotificationsPage() {
                   </p>
                 </div>
                 <UserAvatar
-                  src={n.sender.avatar}
-                  fallback={n.sender.fullName}
+                  src={n.sender?.avatar}
+                  fallback={n.sender?.fullName || "U"}
                   className="h-8 w-8"
                 />
               </Link>

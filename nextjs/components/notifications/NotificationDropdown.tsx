@@ -37,6 +37,8 @@ export function NotificationDropdown() {
   }, []);
 
   const getNotificationText = (n: Notification) => {
+    if (!n || !n.type) return "sent you a notification";
+    
     switch (n.type) {
       case "like":
         return "liked your post";
@@ -47,7 +49,7 @@ export function NotificationDropdown() {
       case "reaction":
         return "reacted to your post";
       default:
-        return "";
+        return "sent you a notification";
     }
   };
 
@@ -105,9 +107,12 @@ export function NotificationDropdown() {
                 {notifications.map((n) => {
                   const config = notificationIcons[n.type];
                   const Icon = config?.icon || Bell;
-                  const href = n.type === "follow"
-                    ? `/profile/${n.sender._id}`
-                    : n.post ? `/post/${n.post._id}` : `/profile/${n.sender._id}`;
+                  
+                  // Safe href generation with fallbacks
+                  let href = `/profile/${n.sender._id}`;
+                  if (n.type !== "follow" && n.post?._id) {
+                    href = `/post/${n.post._id}`;
+                  }
                   
                   return (
                     <Link
@@ -119,14 +124,14 @@ export function NotificationDropdown() {
                       }`}
                     >
                       <UserAvatar
-                        src={n.sender.avatar}
-                        fallback={n.sender.fullName}
+                        src={n.sender?.avatar}
+                        fallback={n.sender?.fullName || "U"}
                         className="h-10 w-10 shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm">
                           <span className="font-semibold">
-                            {n.sender.fullName}
+                            {n.sender?.fullName || "Someone"}
                           </span>{" "}
                           {getNotificationText(n)}
                         </p>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useCallback, useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { 
   Paperclip, 
   Image, 
@@ -81,15 +80,13 @@ export function FileUpload({ onFileSelect, disabled, maxSize = 50 * 1024 * 1024 
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors flex items-center justify-center"
             disabled={disabled}
           >
             <Paperclip className="h-4 w-4" />
-          </Button>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-48">
           {menuItems}
@@ -157,15 +154,13 @@ export function FilePreview({ file, onRemove }: FilePreviewProps) {
         <p className="text-xs text-muted-foreground">{fileSize}</p>
       </div>
       
-      <Button
+      <button
         type="button"
-        variant="ghost"
-        size="icon"
         onClick={onRemove}
-        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+        className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors rounded-full hover:bg-accent flex items-center justify-center"
       >
         <X className="h-4 w-4" />
-      </Button>
+      </button>
     </div>
   );
 }
