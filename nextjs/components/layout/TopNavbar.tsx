@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { UserAvatar } from "@/components/shared/UserAvatar";
+import { NotificationBadge } from "@/components/shared/NotificationBadge";
 import { useTheme } from "next-themes";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useUnreadMessageCount } from "@/hooks/useMessages";
@@ -15,12 +16,10 @@ import {
   Moon,
   Users,
   Video,
-  Store,
   Gamepad2,
   LayoutGrid,
   Settings,
   LogOut,
-  User,
   ChevronDown,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -152,11 +151,7 @@ export function TopNavbar() {
             title="Messages"
           >
             <MessageCircle className="h-5 w-5" />
-            {unreadMessages > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                {unreadMessages > 9 ? "9+" : unreadMessages}
-              </span>
-            )}
+            <NotificationBadge count={unreadMessages} />
           </Link>
 
           {/* Notifications */}
@@ -167,11 +162,7 @@ export function TopNavbar() {
               title="Notifications"
             >
               <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
+              <NotificationBadge count={unreadCount} />
             </Link>
           )}
 
