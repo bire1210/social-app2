@@ -22,7 +22,7 @@ const notificationIcons = {
 };
 
 export default function NotificationsPage() {
-  const { data, isLoading } = useNotifications();
+  const { data, isLoading, error } = useNotifications();
   const markAllRead = useMarkAllRead();
 
   const notifications = data?.notifications ?? [];
@@ -52,6 +52,15 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return <LoadingSpinner className="mt-20" />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-destructive">Failed to load notifications</p>
+        <p className="text-sm text-muted-foreground mt-2">Please try refreshing the page</p>
+      </div>
+    );
   }
 
   return (

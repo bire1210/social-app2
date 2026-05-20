@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { NotificationBadge } from "@/components/shared/NotificationBadge";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useTheme } from "next-themes";
-import { useNotifications } from "@/hooks/useNotifications";
 import { useUnreadMessageCount } from "@/hooks/useMessages";
 import {
   Home,
@@ -32,9 +32,7 @@ export function TopNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: notifData } = useNotifications();
   const { data: msgData } = useUnreadMessageCount();
-  const unreadCount = notifData?.unreadCount ?? 0;
   const unreadMessages = msgData?.unreadCount ?? 0;
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -155,16 +153,7 @@ export function TopNavbar() {
           </Link>
 
           {/* Notifications */}
-          {user && (
-            <Link
-              href="/notifications"
-              className="relative h-10 w-10 rounded-full bg-accent/80 flex items-center justify-center hover:bg-accent transition-colors"
-              title="Notifications"
-            >
-              <Bell className="h-5 w-5" />
-              <NotificationBadge count={unreadCount} />
-            </Link>
-          )}
+          {user && <NotificationDropdown />}
 
           {/* Profile avatar + dropdown */}
           {user ? (
