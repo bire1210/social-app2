@@ -14,7 +14,7 @@ export const userService = {
     return res.data;
   },
 
-  toggleFollow: async (id: string): Promise<{ success: boolean; isFollowing: boolean }> => {
+  toggleFollow: async (id: string): Promise<{ success: boolean; isFollowing: boolean; isMutualFollow?: boolean }> => {
     const res = await api.post(`/users/${id}/follow`);
     return res.data;
   },

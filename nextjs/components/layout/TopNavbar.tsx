@@ -54,7 +54,6 @@ export function TopNavbar() {
     ? [
         { href: "/", icon: Home, label: "Home" },
         { href: "/reels", icon: Video, label: "Reels" },
-        { href: "/explore", icon: Store, label: "Marketplace" },
         { href: "/friends", icon: Users, label: "Friends" },
         { href: "/explore", icon: Gamepad2, label: "Gaming" },
       ]

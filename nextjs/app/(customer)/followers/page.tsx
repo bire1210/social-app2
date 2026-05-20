@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { AuthPromptModal } from "@/components/shared/AuthPromptModal";
 import { User } from "@/types";
-import { UserCheck, Users, ArrowLeft } from "lucide-react";
+import { UserCheck, Users, ArrowLeft, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ function FollowerCard({ follower }: { follower: User }) {
   const { user } = useAuth();
   const toggleFollow = useToggleFollow();
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isMutualFollow, setIsMutualFollow] = useState(false);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
   const handleFollow = async () => {
@@ -27,9 +28,28 @@ function FollowerCard({ follower }: { follower: User }) {
     try {
       const res = await toggleFollow.mutateAsync(follower._id);
       setIsFollowing(res.isFollowing);
+      setIsMutualFollow(res.isMutualFollow || false);
       toast.success(res.isFollowing ? `Following ${follower.fullName}` : `Unfollowed ${follower.fullName}`);
     } catch {
       toast.error("Failed to follow");
+    }
+  };
+
+  const handleButtonClick = () => {
+    if (isMutualFollow) {
+      window.location.href = `/messages?with=${follower._id}`;
+    } else {
+      handleFollow();
+    }
+  };
+
+  const getButtonContent = () => {
+    if (isMutualFollow) {
+      return <><MessageCircle className="h-3.5 w-3.5 mr-1" />Message</>;
+    } else if (isFollowing) {
+      return <><UserCheck className="h-3.5 w-3.5 mr-1" />Following</>;
+    } else {
+      return <>Follow Back</>;
     }
   };
 
@@ -67,20 +87,16 @@ function FollowerCard({ follower }: { follower: User }) {
 
           <div className="flex gap-2 mt-3">
             <Button
-              onClick={handleFollow}
+              onClick={handleButtonClick}
               disabled={toggleFollow.isPending}
               size="sm"
               className={`flex-1 rounded-lg text-xs ${
-                isFollowing
-                  ? "bg-accent text-foreground hover:bg-accent/80"
-                  : "bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white"
+                isMutualFollow || !isFollowing
+                  ? "bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white"
+                  : "bg-accent text-foreground hover:bg-accent/80"
               }`}
             >
-              {isFollowing ? (
-                <><UserCheck className="h-3.5 w-3.5 mr-1" />Following</>
-              ) : (
-                <>Follow</>
-              )}
+              {getButtonContent()}
             </Button>
             <Link href={`/profile/${follower._id}`} className="flex-1">
               <Button variant="outline" size="sm" className="w-full rounded-lg text-xs">

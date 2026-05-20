@@ -40,9 +40,12 @@ export default function ProfilePage() {
   const posts = postsData?.posts ?? [];
   const likedPosts = likedPostsData?.posts ?? [];
   const isOwnProfile = currentUser?._id === userId;
-  const isFollowing = profile && currentUser
-    ? profile.followers.includes(currentUser._id)
-    : false;
+  
+  // Get relationship info from the backend response
+  const relationshipInfo = profile?.relationshipInfo;
+  const isFollowing = relationshipInfo?.isFollowing ?? false;
+  const isFollowedBy = relationshipInfo?.isFollowedBy ?? false;
+  const isMutualFollow = relationshipInfo?.isMutualFollow ?? false;
 
   const handleFollow = async () => {
     if (!currentUser) {
@@ -54,6 +57,47 @@ export default function ProfilePage() {
       toast.success(res.isFollowing ? "Followed!" : "Unfollowed");
     } catch {
       toast.error("Failed to follow/unfollow");
+    }
+  };
+
+  const getFollowButtonContent = () => {
+    if (isMutualFollow) {
+      return (
+        <>
+          <MessageCircle className="h-4 w-4 mr-1" />
+          Message
+        </>
+      );
+    } else if (isFollowing) {
+      return (
+        <>
+          <UserMinus className="h-4 w-4 mr-1" />
+          Following
+        </>
+      );
+    } else if (isFollowedBy) {
+      return (
+        <>
+          <UserPlus className="h-4 w-4 mr-1" />
+          Follow Back
+        </>
+      );
+    } else {
+      return (
+        <>
+          <UserPlus className="h-4 w-4 mr-1" />
+          Follow
+        </>
+      );
+    }
+  };
+
+  const handleButtonClick = () => {
+    if (isMutualFollow) {
+      // Navigate to messages
+      window.location.href = `/messages?with=${userId}`;
+    } else {
+      handleFollow();
     }
   };
 
@@ -108,21 +152,18 @@ export default function ProfilePage() {
             ) : (
               <div className="flex items-center gap-2">
                 <Button
-                  onClick={handleFollow}
+                  onClick={handleButtonClick}
                   disabled={followMutation.isPending}
-                  variant={isFollowing ? "outline" : "default"}
+                  variant={isFollowing && !isMutualFollow ? "outline" : "default"}
                   size="sm"
                   className={`rounded-full ${
-                    !isFollowing ? "bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white" : ""
+                    !isFollowing || isMutualFollow ? "bg-gradient-to-r from-red-500 to-yellow-400 hover:from-red-600 hover:to-yellow-500 text-white" : ""
                   }`}
                 >
-                  {isFollowing ? (
-                    <><UserMinus className="h-4 w-4 mr-1" />Unfollow</>
-                  ) : (
-                    <><UserPlus className="h-4 w-4 mr-1" />Follow</>
-                  )}
+                  {getFollowButtonContent()}
                 </Button>
-                {currentUser && (
+                {/* Show separate message button only if not mutual follow */}
+                {currentUser && !isMutualFollow && (
                   <Link href={`/messages?with=${userId}`}>
                     <Button variant="outline" size="sm" className="rounded-full">
                       <MessageCircle className="h-4 w-4 mr-1" />

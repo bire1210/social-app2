@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
+const { upload, handleUploadError } = require("../middleware/messageUpload");
 const {
   getOrCreateConversation,
   getConversations,
@@ -15,7 +16,12 @@ router
   .get("/unread-count", getUnreadCount)
   .get("/conversations", getConversations)
   .get("/conversations/:id/messages", getMessages)
-  .post("/conversations/:id/messages", sendMessage)
+  .post(
+    "/conversations/:id/messages",
+    upload.single("file"),
+    handleUploadError,
+    sendMessage,
+  )
   .post("/conversations/:userId", getOrCreateConversation);
 
 module.exports = router;

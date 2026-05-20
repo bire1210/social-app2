@@ -26,7 +26,7 @@ exports.getOrCreateConversation = asyncHandler(async (req, res) => {
     conversation = await Conversation.create({ participants: [me, userId] });
     conversation = await Conversation.findById(conversation._id).populate(
       "participants",
-      "username fullName avatar"
+      "username fullName avatar",
     );
   }
 
@@ -53,7 +53,7 @@ exports.getConversations = asyncHandler(async (req, res) => {
         sender: { $ne: req.user._id },
       });
       return { ...conv.toObject(), unreadCount: unread };
-    })
+    }),
   );
 
   res.status(200).json({ success: true, conversations: withUnread });
@@ -83,7 +83,7 @@ exports.getMessages = asyncHandler(async (req, res) => {
   // Mark all as read
   await Message.updateMany(
     { conversation: req.params.id, readBy: { $ne: req.user._id } },
-    { $addToSet: { readBy: req.user._id } }
+    { $addToSet: { readBy: req.user._id } },
   );
 
   const total = await Message.countDocuments({ conversation: req.params.id });
@@ -97,7 +97,11 @@ exports.getMessages = asyncHandler(async (req, res) => {
 
 exports.sendMessage = asyncHandler(async (req, res) => {
   const { content } = req.body;
-  if (!content?.trim()) throw new ApiError(400, "Message content is required");
+
+  // Validate that we have either content or file
+  if (!content?.trim() && !req.file) {
+    throw new ApiError(400, "Message must have either text content or a file");
+  }
 
   const conversation = await Conversation.findOne({
     _id: req.params.id,
@@ -106,12 +110,36 @@ exports.sendMessage = asyncHandler(async (req, res) => {
 
   if (!conversation) throw new ApiError(404, "Conversation not found");
 
-  const message = await Message.create({
+  const messageData = {
     conversation: req.params.id,
     sender: req.user._id,
-    content: content.trim(),
     readBy: [req.user._id],
-  });
+  };
+
+  // Handle text message
+  if (content?.trim()) {
+    messageData.content = content.trim();
+    messageData.messageType = "text";
+  }
+
+  // Handle file message
+  if (req.file) {
+    const fileCategory = req.fileCategory || "file";
+    messageData.messageType = fileCategory;
+    messageData.file = {
+      url: `/uploads/messages/${req.file.filename}`,
+      originalName: req.file.originalname,
+      mimeType: req.file.mimetype,
+      size: req.file.size,
+    };
+
+    // If there's both content and file, treat as file with caption
+    if (content?.trim()) {
+      messageData.content = content.trim();
+    }
+  }
+
+  const message = await Message.create(messageData);
 
   // Update conversation's lastMessage
   await Conversation.findByIdAndUpdate(req.params.id, {
@@ -121,12 +149,11 @@ exports.sendMessage = asyncHandler(async (req, res) => {
 
   const populated = await Message.findById(message._id).populate(
     "sender",
-    "username fullName avatar"
+    "username fullName avatar",
   );
 
   res.status(201).json({ success: true, message: populated });
 });
-
 
 exports.getUnreadCount = asyncHandler(async (req, res) => {
   const conversations = await Conversation.find({ participants: req.user._id });

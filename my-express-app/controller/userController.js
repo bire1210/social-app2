@@ -16,9 +16,26 @@ exports.getUserProfile = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
+  // Add relationship info if user is authenticated
+  let relationshipInfo = {};
+  if (req.user) {
+    const isFollowing = req.user.following.includes(req.params.id);
+    const isFollowedBy = user.following.includes(req.user._id);
+    const isMutualFollow = isFollowing && isFollowedBy;
+
+    relationshipInfo = {
+      isFollowing,
+      isFollowedBy,
+      isMutualFollow,
+    };
+  }
+
   res.status(200).json({
     success: true,
-    user,
+    user: {
+      ...user.toObject(),
+      relationshipInfo,
+    },
   });
 });
 
@@ -88,6 +105,7 @@ exports.toggleFollow = asyncHandler(async (req, res) => {
       success: true,
       message: "Unfollowed successfully",
       isFollowing: false,
+      isMutualFollow: false,
     });
   } else {
     // Follow
@@ -97,6 +115,9 @@ exports.toggleFollow = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(req.params.id, {
       $addToSet: { followers: req.user._id },
     });
+
+    // Check if it's now a mutual follow (they follow us back)
+    const isMutualFollow = userToFollow.following.includes(req.user._id);
 
     // Create notification
     await createNotification({
@@ -109,6 +130,7 @@ exports.toggleFollow = asyncHandler(async (req, res) => {
       success: true,
       message: "Followed successfully",
       isFollowing: true,
+      isMutualFollow,
     });
   }
 });
@@ -124,7 +146,7 @@ exports.searchUsers = asyncHandler(async (req, res) => {
   }
 
   const searchRegex = new RegExp(q.trim(), "i");
-  
+
   const users = await User.find({
     $and: [
       { _id: { $ne: req.user._id } },

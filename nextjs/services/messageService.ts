@@ -17,8 +17,22 @@ export const messageService = {
     return res.data;
   },
 
-  sendMessage: async (conversationId: string, content: string): Promise<{ success: boolean; message: Message }> => {
-    const res = await api.post(`/messages/conversations/${conversationId}/messages`, { content });
+  sendMessage: async (conversationId: string, content?: string, file?: File): Promise<{ success: boolean; message: Message }> => {
+    const formData = new FormData();
+    
+    if (content) {
+      formData.append("content", content);
+    }
+    
+    if (file) {
+      formData.append("file", file);
+    }
+
+    const res = await api.post(`/messages/conversations/${conversationId}/messages`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return res.data;
   },
 

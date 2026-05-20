@@ -28,7 +28,7 @@ exports.register = asyncHandler(async (req, res) => {
       400,
       existingUser.email === normalizedEmail
         ? "Email already registered"
-        : "Username already taken"
+        : "Username already taken",
     );
   }
 

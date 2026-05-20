@@ -16,6 +16,11 @@ export interface User {
   location: string;
   createdAt: string;
   updatedAt: string;
+  relationshipInfo?: {
+    isFollowing: boolean;
+    isFollowedBy: boolean;
+    isMutualFollow: boolean;
+  };
 }
 
 export type ReactionType = "like" | "love" | "haha" | "wow" | "sad" | "angry";
@@ -99,7 +104,14 @@ export interface Message {
   _id: string;
   conversation: string;
   sender: User;
-  content: string;
+  content?: string;
+  messageType: "text" | "image" | "video" | "audio" | "document" | "file";
+  file?: {
+    url: string;
+    originalName: string;
+    mimeType: string;
+    size: number;
+  };
   readBy: string[];
   createdAt: string;
 }

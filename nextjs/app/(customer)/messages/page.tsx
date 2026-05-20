@@ -12,6 +12,8 @@ import {
 import { useSearchUsers } from "@/hooks/useUsers";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { FileUpload, FilePreview } from "@/components/messages/FileUpload";
+import { MessageBubble } from "@/components/messages/MessageBubble";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Conversation, Message, User } from "@/types";
@@ -85,7 +87,20 @@ function ConversationList({
                 </span>
               </div>
               <p className={`text-xs truncate mt-0.5 ${conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
-                {conv.lastMessage?.content ?? "Start a conversation"}
+                {conv.lastMessage?.messageType === "text" 
+                  ? conv.lastMessage?.content ?? "Start a conversation"
+                  : conv.lastMessage?.messageType === "image"
+                  ? "📷 Photo"
+                  : conv.lastMessage?.messageType === "video"
+                  ? "🎥 Video"
+                  : conv.lastMessage?.messageType === "audio"
+                  ? "🎵 Audio"
+                  : conv.lastMessage?.messageType === "document"
+                  ? "📄 Document"
+                  : conv.lastMessage?.messageType === "file"
+                  ? "📎 File"
+                  : "Start a conversation"
+                }
               </p>
             </div>
           </button>
@@ -101,6 +116,7 @@ function ChatWindow({ conversation }: { conversation: Conversation }) {
   const { data, isLoading } = useMessages(conversation._id);
   const sendMessage = useSendMessage(conversation._id);
   const [text, setText] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const messages = data?.messages ?? [];
 
@@ -112,15 +128,29 @@ function ChatWindow({ conversation }: { conversation: Conversation }) {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim() || sendMessage.isPending) return;
+    if ((!text.trim() && !selectedFile) || sendMessage.isPending) return;
+    
     const content = text.trim();
+    const file = selectedFile;
+    
     setText("");
+    setSelectedFile(null);
+    
     try {
-      await sendMessage.mutateAsync(content);
+      await sendMessage.mutateAsync({ content: content || undefined, file: file || undefined });
     } catch {
       toast.error("Failed to send message");
       setText(content);
+      setSelectedFile(file);
     }
+  };
+
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+  };
+
+  const handleFileRemove = () => {
+    setSelectedFile(null);
   };
 
   return (
@@ -145,43 +175,48 @@ function ChatWindow({ conversation }: { conversation: Conversation }) {
             <p className="text-sm text-muted-foreground mt-1">Say hello!</p>
           </div>
         ) : (
-          messages.map((msg: Message) => {
+          messages.map((msg: Message, index: number) => {
             const isMe = msg.sender._id === user?._id;
+            const prevMsg = messages[index - 1];
+            const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
+            
             return (
-              <div key={msg._id} className={`flex items-end gap-2 ${isMe ? "flex-row-reverse" : ""}`}>
-                {!isMe && (
-                  <UserAvatar src={msg.sender.avatar} fallback={msg.sender.fullName} className="h-7 w-7 shrink-0" />
-                )}
-                <div
-                  className={`max-w-[70%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
-                    isMe
-                      ? "bg-gradient-to-r from-red-500 to-yellow-400 text-white rounded-br-sm"
-                      : "bg-accent rounded-bl-sm"
-                  }`}
-                >
-                  {msg.content}
-                </div>
-              </div>
+              <MessageBubble
+                key={msg._id}
+                message={msg}
+                isMe={isMe}
+                showAvatar={showAvatar}
+              />
             );
           })
         )}
         <div ref={bottomRef} />
       </div>
 
+      {/* File Preview */}
+      {selectedFile && (
+        <div className="px-4 py-2 border-t border-border">
+          <FilePreview file={selectedFile} onRemove={handleFileRemove} />
+        </div>
+      )}
+
       {/* Input */}
       <form onSubmit={handleSend} className="flex items-center gap-2 px-4 py-3 border-t border-border shrink-0">
         <UserAvatar src={user?.avatar} fallback={user?.fullName ?? "?"} className="h-8 w-8 shrink-0" />
+        
+        <FileUpload onFileSelect={handleFileSelect} disabled={sendMessage.isPending} />
+        
         <div className="flex-1 relative">
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Aa"
+            placeholder={selectedFile ? "Add a caption..." : "Aa"}
             maxLength={2000}
             className="w-full h-9 rounded-full bg-accent/80 px-4 pr-10 text-sm outline-none focus:ring-2 focus:ring-red-500/30"
           />
           <button
             type="submit"
-            disabled={!text.trim() || sendMessage.isPending}
+            disabled={(!text.trim() && !selectedFile) || sendMessage.isPending}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 disabled:text-muted-foreground transition-colors"
           >
             {sendMessage.isPending ? (
