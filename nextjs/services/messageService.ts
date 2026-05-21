@@ -18,22 +18,40 @@ export const messageService = {
   },
 
   sendMessage: async (conversationId: string, content?: string, file?: File): Promise<{ success: boolean; message: Message }> => {
+    console.log("=== DEBUG: sendMessage service called ===");
+    console.log("Conversation ID:", conversationId);
+    console.log("Content:", content);
+    console.log("File:", file);
+
     const formData = new FormData();
     
     if (content) {
       formData.append("content", content);
+      console.log("Added content to FormData");
     }
     
     if (file) {
       formData.append("file", file);
+      console.log("Added file to FormData");
     }
 
-    const res = await api.post(`/messages/conversations/${conversationId}/messages`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    return res.data;
+    console.log("FormData entries:");
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    try {
+      const res = await api.post(`/messages/conversations/${conversationId}/messages`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("API response:", res.data);
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      throw error;
+    }
   },
 
   getUnreadCount: async (): Promise<{ success: boolean; unreadCount: number }> => {

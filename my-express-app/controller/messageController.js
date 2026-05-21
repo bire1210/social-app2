@@ -96,10 +96,17 @@ exports.getMessages = asyncHandler(async (req, res) => {
 });
 
 exports.sendMessage = asyncHandler(async (req, res) => {
+  console.log("=== DEBUG: sendMessage called ===");
+  console.log("Body:", req.body);
+  console.log("File:", req.file);
+  console.log("User:", req.user?._id);
+  console.log("Conversation ID:", req.params.id);
+
   const { content } = req.body;
 
   // Validate that we have either content or file
   if (!content?.trim() && !req.file) {
+    console.log("ERROR: No content or file provided");
     throw new ApiError(400, "Message must have either text content or a file");
   }
 
@@ -108,7 +115,10 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     participants: req.user._id,
   });
 
-  if (!conversation) throw new ApiError(404, "Conversation not found");
+  if (!conversation) {
+    console.log("ERROR: Conversation not found");
+    throw new ApiError(404, "Conversation not found");
+  }
 
   const messageData = {
     conversation: req.params.id,
@@ -120,6 +130,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
   if (content?.trim()) {
     messageData.content = content.trim();
     messageData.messageType = "text";
+    console.log("Text message data:", messageData);
   }
 
   // Handle file message
@@ -137,22 +148,33 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     if (content?.trim()) {
       messageData.content = content.trim();
     }
+    console.log("File message data:", messageData);
   }
 
-  const message = await Message.create(messageData);
+  console.log("Final message data:", messageData);
 
-  // Update conversation's lastMessage
-  await Conversation.findByIdAndUpdate(req.params.id, {
-    lastMessage: message._id,
-    lastMessageAt: new Date(),
-  });
+  try {
+    const message = await Message.create(messageData);
+    console.log("Message created successfully:", message._id);
 
-  const populated = await Message.findById(message._id).populate(
-    "sender",
-    "username fullName avatar",
-  );
+    // Update conversation's lastMessage
+    await Conversation.findByIdAndUpdate(req.params.id, {
+      lastMessage: message._id,
+      lastMessageAt: new Date(),
+    });
 
-  res.status(201).json({ success: true, message: populated });
+    const populated = await Message.findById(message._id).populate(
+      "sender",
+      "username fullName avatar",
+    );
+
+    console.log("Populated message:", populated);
+
+    res.status(201).json({ success: true, message: populated });
+  } catch (error) {
+    console.log("ERROR creating message:", error);
+    throw error;
+  }
 });
 
 exports.getUnreadCount = asyncHandler(async (req, res) => {

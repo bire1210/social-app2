@@ -128,17 +128,31 @@ function ChatWindow({ conversation }: { conversation: Conversation }) {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!text.trim() && !selectedFile) || sendMessage.isPending) return;
+    console.log("=== DEBUG: handleSend called ===");
+    console.log("Text:", text);
+    console.log("Selected file:", selectedFile);
+    console.log("Send message pending:", sendMessage.isPending);
+    
+    if ((!text.trim() && !selectedFile) || sendMessage.isPending) {
+      console.log("Validation failed - no content or already pending");
+      return;
+    }
     
     const content = text.trim();
     const file = selectedFile;
+    
+    console.log("Prepared content:", content);
+    console.log("Prepared file:", file);
     
     setText("");
     setSelectedFile(null);
     
     try {
-      await sendMessage.mutateAsync({ content: content || undefined, file: file || undefined });
-    } catch {
+      console.log("Calling sendMessage.mutateAsync...");
+      const result = await sendMessage.mutateAsync({ content: content || undefined, file: file || undefined });
+      console.log("Message sent successfully:", result);
+    } catch (error) {
+      console.error("Failed to send message:", error);
       toast.error("Failed to send message");
       setText(content);
       setSelectedFile(file);
