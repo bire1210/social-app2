@@ -13,10 +13,10 @@ export default function FeedPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  // Guests get redirected to explore (feed requires auth)
+  // Guests get redirected to home (explore feed)
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/explore");
+      router.replace("/");
     }
   }, [user, loading, router]);
 

@@ -67,6 +67,27 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/stories", storyRoutes);
 app.use("/api/live", liveStreamRoutes);
 
+// Home route
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Welcome to the Social Media API",
+    version: "1.0.0",
+    endpoints: {
+      auth: "/api/auth",
+      users: "/api/users",
+      posts: "/api/posts",
+      comments: "/api/comments",
+      notifications: "/api/notifications",
+      admin: "/api/admin",
+      messages: "/api/messages",
+      stories: "/api/stories",
+      live: "/api/live",
+      health: "/api/health",
+    },
+  });
+});
+
 // Health check
 app.get("/api/health", (req, res) => {
   res.status(200).json({ success: true, message: "API is running 🚀" });
