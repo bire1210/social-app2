@@ -1,6 +1,5 @@
 import api from "@/lib/api";
 import { AuthResponse } from "@/types";
-
 export const authService = {
   register: async (data: {
     username: string;
@@ -11,7 +10,6 @@ export const authService = {
     const res = await api.post("/auth/register", data);
     return res.data;
   },
-  
   login: async (data: {
     email: string;
     password: string;
