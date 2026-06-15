@@ -30,10 +30,24 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        // Only redirect if not already on login page
-        if (!window.location.pathname.includes("/login")) {
+        // Don't clear tokens or redirect for auth-check calls (getMe)
+        const requestUrl = error.config?.url || "";
+        const isAuthCheck = requestUrl.includes("/auth/me");
+
+        // Public pages where 401 is expected — don't redirect
+        const publicPaths = ["/login", "/register", "/explore"];
+        const isOnPublicPage = publicPaths.some((p) =>
+          window.location.pathname.includes(p)
+        );
+        const isOnHomePage = window.location.pathname === "/";
+
+        if (!isAuthCheck) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
+
+        // Only redirect to login if user is on a protected page
+        if (!isOnPublicPage && !isOnHomePage && !isAuthCheck) {
           window.location.href = "/login";
         }
       }
