@@ -41,11 +41,7 @@ export const messageService = {
     }
 
     try {
-      const res = await api.post(`/messages/conversations/${conversationId}/messages`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const res = await api.post(`/messages/conversations/${conversationId}/messages`, formData);
       console.log("API response:", res.data);
       return res.data;
     } catch (error) {

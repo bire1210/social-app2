@@ -1,14 +1,14 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const messageSchema = new mongoose.Schema(
+const messageSchema = new Schema(
   {
     conversation: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Conversation",
       required: true,
     },
     sender: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
@@ -24,7 +24,7 @@ const messageSchema = new mongoose.Schema(
       mimeType: { type: String },
       size: { type: Number }, // in bytes
     },
-    readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    readBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true },
 );
@@ -39,4 +39,4 @@ messageSchema.pre("save", function (next) {
 
 messageSchema.index({ conversation: 1, createdAt: 1 });
 
-module.exports = mongoose.model("Message", messageSchema);
+export default model("Message", messageSchema);

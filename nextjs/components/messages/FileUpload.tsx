@@ -79,7 +79,7 @@ export function FileUpload({ onFileSelect, disabled, maxSize = 50 * 1024 * 1024 
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger render={
           <button
             type="button"
             className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors flex items-center justify-center"
@@ -87,7 +87,7 @@ export function FileUpload({ onFileSelect, disabled, maxSize = 50 * 1024 * 1024 
           >
             <Paperclip className="h-4 w-4" />
           </button>
-        </DropdownMenuTrigger>
+        } />
         <DropdownMenuContent align="start" className="w-48">
           {menuItems}
         </DropdownMenuContent>

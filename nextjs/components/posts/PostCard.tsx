@@ -22,6 +22,7 @@ import {
   Pencil,
   Loader2,
   Send,
+  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -132,8 +133,10 @@ export function PostCard({ post }: PostCardProps) {
 
   const handleComment = () => {
     if (!user) { setShowAuthPrompt(true); return; }
-    setShowComments(true);
-    setTimeout(() => document.getElementById(`comment-input-${post._id}`)?.focus(), 100);
+    setShowComments((prev) => !prev);
+    if (!showComments) {
+      setTimeout(() => document.getElementById(`comment-input-${post._id}`)?.focus(), 100);
+    }
   };
 
   const handleShare = () => {
@@ -364,9 +367,17 @@ export function PostCard({ post }: PostCardProps) {
 
         {/* Comments section */}
         {showComments && (
-          <div className="border-t border-border px-4 py-3 space-y-3">
+          <div className="border-t border-border px-4 py-3 space-y-3 relative">
+            <button
+              onClick={() => setShowComments(false)}
+              className="absolute top-2 right-2 p-1.5 rounded-full text-muted-foreground hover:bg-accent hover:text-foreground transition-colors z-10"
+              title="Close comments"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            
             {user && (
-              <form onSubmit={handleAddComment} className="flex items-center gap-2">
+              <form onSubmit={handleAddComment} className="flex items-center gap-2 pr-8">
                 <UserAvatar src={user.avatar} fallback={user.fullName} className="h-8 w-8 shrink-0" />
                 <div className="flex-1 relative">
                   <input

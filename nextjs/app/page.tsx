@@ -40,7 +40,6 @@ export default function HomePage() {
       </div>
     );
   }
-
   // Authenticated user — show full layout with FYP feed
   return (
     <div className="min-h-screen bg-background">

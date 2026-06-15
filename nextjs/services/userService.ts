@@ -8,9 +8,7 @@ export const userService = {
   },
 
   updateProfile: async (data: FormData): Promise<{ success: boolean; user: User }> => {
-    const res = await api.put("/users/profile", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const res = await api.put("/users/profile", data);
     return res.data;
   },
 
