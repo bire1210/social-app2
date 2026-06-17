@@ -36,7 +36,6 @@ messageSchema.pre("save", function (next) {
   }
   next();
 });
-
 messageSchema.index({ conversation: 1, createdAt: 1 });
 
 export default model("Message", messageSchema);

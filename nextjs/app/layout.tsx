@@ -5,6 +5,7 @@ import { AuthInitializer } from "@/components/shared/AuthInitializer";
 import { NetworkErrorHandler } from "@/components/shared/NetworkErrorHandler";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { SocketProvider } from "@/providers/SocketProvider";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
@@ -27,18 +28,20 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider>
           <QueryProvider>
-            <AuthInitializer>
-              <NetworkErrorHandler />
-              {children}
-              <Toaster
-                position="bottom-right"
-                toastOptions={{
-                  className:
-                    "!bg-card !text-card-foreground !border !border-border",
-                  duration: 3000,
-                }}
-              />
-            </AuthInitializer>
+            <SocketProvider>
+              <AuthInitializer>
+                <NetworkErrorHandler />
+                {children}
+                <Toaster
+                  position="bottom-right"
+                  toastOptions={{
+                    className:
+                      "!bg-card !text-card-foreground !border !border-border",
+                    duration: 3000,
+                  }}
+                />
+              </AuthInitializer>
+            </SocketProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

@@ -1,12 +1,13 @@
 const Notification = require("../models/Notification");
+const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 
 // @desc    Get notifications for the logged-in user
 // @route   GET /api/notifications
 // @access  Private
 exports.getNotifications = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 20;
+  const page = Number.parseInt(req.query.page) || 1;
+  const limit = Number.parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
 
   const notifications = await Notification.find({ recipient: req.user._id })
@@ -42,6 +43,26 @@ exports.markAllAsRead = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "All notifications marked as read",
+  });
+});
+
+// @desc    Mark a single notification as read
+// @route   PUT /api/notifications/:id/read
+// @access  Private
+exports.markAsRead = asyncHandler(async (req, res) => {
+  const notification = await Notification.findOneAndUpdate(
+    { _id: req.params.id, recipient: req.user._id },
+    { isRead: true },
+    { new: true }
+  );
+
+  if (!notification) {
+    throw new ApiError(404, "Notification not found");
+  }
+
+  res.status(200).json({
+    success: true,
+    notification,
   });
 });
 
