@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+const { Schema, model } = require("mongoose");
 
 const messageSchema = new Schema(
   {
@@ -38,4 +38,4 @@ messageSchema.pre("save", function (next) {
 });
 messageSchema.index({ conversation: 1, createdAt: 1 });
 
-export default model("Message", messageSchema);
+module.exports = model("Message", messageSchema);

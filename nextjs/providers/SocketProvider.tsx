@@ -1,13 +1,18 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { io, Socket } from "socket.io-client";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { notificationKeys } from "@/hooks/useNotifications";
 import { toast } from "react-hot-toast";
 import { Notification } from "@/types";
-
+import { io, Socket } from "socket.io-client";
 interface SocketContextType {
   socket: Socket | null;
   connected: boolean;
@@ -30,16 +35,21 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getNotificationText = useCallback((n: Notification) => {
     switch (n.type) {
-      case "like": return "liked your post";
-      case "comment": return "commented on your post";
-      case "follow": return "started following you";
-      default: return "sent you a notification";
+      case "like":
+        return "liked your post";
+      case "comment":
+        return "commented on your post";
+      case "follow":
+        return "started following you";
+      default:
+        return "sent you a notification";
     }
   }, []);
 
   useEffect(() => {
     if (user?._id) {
-      const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+      const socketUrl =
+        process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
       const newSocket = io(socketUrl, {
         withCredentials: true,
       });
@@ -64,21 +74,27 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
           if (!old) return old;
           return {
             ...old,
-            notifications: [notification, ...(old.notifications || [])].slice(0, 50),
+            notifications: [notification, ...(old.notifications || [])].slice(
+              0,
+              50,
+            ),
             unreadCount: (old.unreadCount || 0) + 1,
           };
         });
 
         // Show premium toast
-        toast.success(`${notification.sender.fullName} ${getNotificationText(notification)}`, {
-          icon: "🔔",
-          style: {
-            borderRadius: "12px",
-            background: "#1f2937",
-            color: "#fff",
-            border: "1px solid #374151",
+        toast.success(
+          `${notification.sender.fullName} ${getNotificationText(notification)}`,
+          {
+            icon: "🔔",
+            style: {
+              borderRadius: "12px",
+              background: "#1f2937",
+              color: "#fff",
+              border: "1px solid #374151",
+            },
           },
-        });
+        );
       });
 
       setSocket(newSocket);
@@ -92,11 +108,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [user, queryClient, getNotificationText]);
 
-  const value = React.useMemo(() => ({ socket, connected }), [socket, connected]);
+  const value = React.useMemo(
+    () => ({ socket, connected }),
+    [socket, connected],
+  );
 
   return (
-    <SocketContext.Provider value={value}>
-      {children}
-    </SocketContext.Provider>
+    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
   );
 };
