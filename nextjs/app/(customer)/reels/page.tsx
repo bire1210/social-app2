@@ -3,7 +3,11 @@
 import { useVideoFeed } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
 import { useReactToPost } from "@/hooks/usePosts";
-import { useComments, useAddComment, useDeleteComment } from "@/hooks/useComments";
+import {
+  useComments,
+  useAddComment,
+  useDeleteComment,
+} from "@/hooks/useComments";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { AuthPromptModal } from "@/components/shared/AuthPromptModal";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
@@ -26,13 +30,8 @@ import { formatDistanceToNow } from "date-fns";
 
 export default function ReelsPage() {
   const { user } = useAuth();
-  const {
-    data,
-    isLoading,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useVideoFeed();
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useVideoFeed();
   const reactToPost = useReactToPost();
   const addComment = useAddComment();
   const deleteComment = useDeleteComment();
@@ -44,19 +43,36 @@ export default function ReelsPage() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mutedVideos, setMutedVideos] = useState<Record<string, boolean>>({});
-  const [playingVideos, setPlayingVideos] = useState<Record<string, boolean>>({});
+  const [playingVideos, setPlayingVideos] = useState<Record<string, boolean>>(
+    {},
+  );
+  // Optimistic like state: tracks local overrides for liked status and count
+  const [optimisticLikes, setOptimisticLikes] = useState<
+    Record<string, { liked: boolean; count: number }>
+  >({});
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 
   // Fetch comments for the selected post
   const { data: commentsData, isLoading: commentsLoading } = useComments(
-    showComments && selectedPostId ? selectedPostId : ""
+    showComments && selectedPostId ? selectedPostId : "",
   );
   const comments = commentsData?.comments ?? [];
 
   const posts = (data?.pages.flatMap((page) => page.posts) ?? []).filter(
-    (p) => p.author != null
+    (p) => p.author != null,
   );
+
+  // Helper to get the like state for a post (optimistic or from server)
+  const getLikeState = (post: any) => {
+    if (optimisticLikes[post._id]) {
+      return optimisticLikes[post._id];
+    }
+    return {
+      liked: !!post.userReaction,
+      count: post.reactions?.length || 0,
+    };
+  };
 
   const getVideoUrl = (path: string) => {
     if (!path) return "";
@@ -82,10 +98,20 @@ export default function ReelsPage() {
 
   // Fetch next page when nearing the end
   useEffect(() => {
-    if (currentIndex >= posts.length - 2 && hasNextPage && !isFetchingNextPage) {
+    if (
+      currentIndex >= posts.length - 2 &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
       fetchNextPage();
     }
-  }, [currentIndex, posts.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [
+    currentIndex,
+    posts.length,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  ]);
 
   // Scroll snap observer
   useEffect(() => {
@@ -96,12 +122,14 @@ export default function ReelsPage() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const idx = parseInt(entry.target.getAttribute("data-index") || "0");
+            const idx = parseInt(
+              entry.target.getAttribute("data-index") || "0",
+            );
             setCurrentIndex(idx);
           }
         });
       },
-      { root: container, threshold: 0.7 }
+      { root: container, threshold: 0.7 },
     );
 
     const items = container.querySelectorAll("[data-index]");
@@ -134,9 +162,31 @@ export default function ReelsPage() {
       setShowAuthPrompt(true);
       return;
     }
+
+    // Get current state (either from optimistic or server data)
+    const post = posts.find((p) => p._id === postId);
+    if (!post) return;
+    const current = getLikeState(post);
+    const wasLiked = current.liked;
+    const prevCount = current.count;
+
+    // Optimistic update: toggle immediately
+    setOptimisticLikes((prev) => ({
+      ...prev,
+      [postId]: {
+        liked: !wasLiked,
+        count: wasLiked ? Math.max(0, prevCount - 1) : prevCount + 1,
+      },
+    }));
+
     try {
       await reactToPost.mutateAsync({ id: postId, type: "like" });
     } catch {
+      // Roll back on failure
+      setOptimisticLikes((prev) => ({
+        ...prev,
+        [postId]: { liked: wasLiked, count: prevCount },
+      }));
       toast.error("Failed to react");
     }
   };
@@ -155,7 +205,11 @@ export default function ReelsPage() {
     if (!commentText.trim() && !commentFile) return;
 
     try {
-      await addComment.mutateAsync({ postId, content: commentText, file: commentFile || undefined });
+      await addComment.mutateAsync({
+        postId,
+        content: commentText,
+        file: commentFile || undefined,
+      });
       setCommentText("");
       setCommentFile(null);
     } catch {
@@ -216,7 +270,9 @@ export default function ReelsPage() {
             <div className="flex-1 relative flex items-center justify-center">
               {/* Video */}
               <video
-                ref={(el) => { videoRefs.current[post._id] = el; }}
+                ref={(el) => {
+                  videoRefs.current[post._id] = el;
+                }}
                 src={getVideoUrl(post.video)}
                 loop
                 muted={mutedVideos[post._id] !== false}
@@ -273,24 +329,31 @@ export default function ReelsPage() {
               {/* Right side action buttons */}
               <div className="absolute right-3 bottom-28 flex flex-col items-center gap-5">
                 {/* Like */}
-                <button
-                  onClick={() => handleLike(post._id)}
-                  className="flex flex-col items-center gap-1 group"
-                >
-                  <div className={`h-11 w-11 rounded-full flex items-center justify-center transition-all ${
-                    post.userReaction
-                      ? "bg-red-500/20 text-red-500"
-                      : "bg-white/10 backdrop-blur-sm text-white hover:bg-white/20"
-                  }`}>
-                    <Heart
-                      className="h-6 w-6"
-                      fill={post.userReaction ? "currentColor" : "none"}
-                    />
-                  </div>
-                  <span className="text-white text-xs font-medium">
-                    {post.reactions?.length || 0}
-                  </span>
-                </button>
+                {(() => {
+                  const likeState = getLikeState(post);
+                  return (
+                    <button
+                      onClick={() => handleLike(post._id)}
+                      className="flex flex-col items-center gap-1 group"
+                    >
+                      <div
+                        className={`h-11 w-11 rounded-full flex items-center justify-center transition-all ${
+                          likeState.liked
+                            ? "bg-red-500/20 text-red-500 scale-110"
+                            : "bg-white/10 backdrop-blur-sm text-white hover:bg-white/20"
+                        }`}
+                      >
+                        <Heart
+                          className={`h-6 w-6 transition-transform ${likeState.liked ? "animate-[heartBounce_0.3s_ease-out]" : ""}`}
+                          fill={likeState.liked ? "currentColor" : "none"}
+                        />
+                      </div>
+                      <span className="text-white text-xs font-medium">
+                        {likeState.count}
+                      </span>
+                    </button>
+                  );
+                })()}
 
                 {/* Comment */}
                 <button
@@ -341,8 +404,18 @@ export default function ReelsPage() {
                   className="absolute top-2 right-2 text-white/50 hover:text-white transition-colors"
                   title="Close comments"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
 
@@ -354,7 +427,10 @@ export default function ReelsPage() {
                     </div>
                   ) : comments.length > 0 ? (
                     comments.map((comment: any) => (
-                      <div key={comment._id} className="flex items-start gap-2 group">
+                      <div
+                        key={comment._id}
+                        className="flex items-start gap-2 group"
+                      >
                         <Link href={`/profile/${comment.author._id}`}>
                           <UserAvatar
                             src={comment.author.avatar}
@@ -371,7 +447,9 @@ export default function ReelsPage() {
                               {comment.author.fullName}
                             </Link>
                             {comment.content && (
-                              <p className="text-xs text-white/90 mt-0.5 break-words">{comment.content}</p>
+                              <p className="text-xs text-white/90 mt-0.5 break-words">
+                                {comment.content}
+                              </p>
                             )}
                           </div>
                           {/* Media */}
@@ -397,7 +475,9 @@ export default function ReelsPage() {
                         </div>
                         {user && user._id === comment.author._id && (
                           <button
-                            onClick={() => handleDeleteComment(comment._id, post._id)}
+                            onClick={() =>
+                              handleDeleteComment(comment._id, post._id)
+                            }
                             className="opacity-0 group-hover:opacity-100 transition-opacity text-white/50 hover:text-red-500"
                           >
                             <Trash2 className="h-3 w-3" />
@@ -406,13 +486,18 @@ export default function ReelsPage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-xs text-white/50 text-center py-2">No comments yet</p>
+                    <p className="text-xs text-white/50 text-center py-2">
+                      No comments yet
+                    </p>
                   )}
                 </div>
 
                 {/* Comment Input */}
                 {user && (
-                  <form onSubmit={(e) => handleAddComment(e, post._id)} className="flex items-center gap-2 pt-3 border-t border-white/10">
+                  <form
+                    onSubmit={(e) => handleAddComment(e, post._id)}
+                    className="flex items-center gap-2 pt-3 border-t border-white/10"
+                  >
                     <UserAvatar
                       src={user.avatar}
                       fallback={user.fullName}
@@ -428,19 +513,34 @@ export default function ReelsPage() {
                       />
                       {/* File input */}
                       <label className="absolute right-10 top-1/2 -translate-y-1/2 text-white/50 hover:text-white cursor-pointer transition-colors">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 4v16m8-8H4"
+                          />
                         </svg>
                         <input
                           type="file"
                           accept="image/*,video/*"
-                          onChange={(e) => setCommentFile(e.target.files?.[0] || null)}
+                          onChange={(e) =>
+                            setCommentFile(e.target.files?.[0] || null)
+                          }
                           className="hidden"
                         />
                       </label>
                       <button
                         type="submit"
-                        disabled={(!commentText.trim() && !commentFile) || addComment.isPending}
+                        disabled={
+                          (!commentText.trim() && !commentFile) ||
+                          addComment.isPending
+                        }
                         className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 disabled:text-white/30"
                       >
                         {addComment.isPending ? (
